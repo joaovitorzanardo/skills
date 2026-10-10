@@ -15,12 +15,12 @@
 |---|---|---|---|
 
 ## 3. Metas da semana ({{dd/mm a dd/mm}})
-| Meta (número e prazo) | Progresso |
-|---|---|
+| Meta (número e prazo) | Meta (ID) | Progresso |
+|---|---|---|
 
 ## 4. Pendências
-| Próxima ação | Projeto/matéria | Prazo | Estimativa (com folga) | Critério de pronto | Status |
-|---|---|---|---|---|---|
+| Próxima ação | Projeto/matéria | Meta (ID) | Prazo | Estimativa (com folga) | Critério de pronto | Status |
+|---|---|---|---|---|---|---|
 
 ## 5. Calendário de revisões
 | Assunto | Estudado em | D+1 | D+3 | D+7 | D+21 | Prova |
@@ -32,7 +32,7 @@
 |---|---|---|---|---|---|
 
 ## 7. Diário (últimas 2 semanas)
-- {{dd/mm}}: feito / atrasou / causa provável
+- {{dd/mm}}: feito (com ID da meta) / atrasou / causa provável
 
 Semanas anteriores (1 linha cada):
 
