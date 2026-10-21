@@ -88,7 +88,7 @@ Before you reply, verify:
 
 - The number of feature nodes in the diagram equals the number of items in "Features of the MVP" plus "Later List" (not counting `—` placeholders).
 - Every name matches exactly between the diagram and the lists, and each feature appears in exactly one list.
-- All four columns are present, each with at least one node. The invisible order links are in place.
+- All four columns are present, each with at least one node. Each column's nodes are chained vertically with `~~~`, and no link crosses between columns.
 - Every Must has a reason that ties back to the riskiest assumption, or to legal and safety needs.
 - Inferred features and inferred customers or assumptions are marked as inferences.
 
@@ -107,25 +107,20 @@ Use this structure:
 ## MoSCoW method (Must / Should / Could / Won't)
 
 ```mermaid
-flowchart LR
+%%{init: {"flowchart": {"nodeSpacing": 30, "rankSpacing": 20}, "themeVariables": {"fontSize": "16px"}}}%%
+flowchart TB
   subgraph MUST["MUST HAVE"]
-    direction TB
-    m1["Feature A"]
-    m2["Feature B"]
+    m1["Feature A"] ~~~ m2["Feature B"] ~~~ m3["Feature F"]
   end
   subgraph SHOULD["SHOULD HAVE"]
-    direction TB
     s1["Feature C"]
   end
   subgraph COULD["COULD HAVE"]
-    direction TB
     c1["Feature D"]
   end
   subgraph WONT["WON'T HAVE (this time)"]
-    direction TB
     w1["Feature E"]
   end
-  MUST ~~~ SHOULD ~~~ COULD ~~~ WONT
   style MUST fill:#d4edbc,stroke:#5a8f29,color:#000
   style SHOULD fill:#ffd8a8,stroke:#d9822b,color:#000
   style COULD fill:#fff3a3,stroke:#c9a400,color:#000
@@ -161,7 +156,10 @@ Contradictions, gaps or unclear points in the PRD that affected a call. Leave th
 These rules keep the diagram rendering on GitHub and in most Markdown viewers.
 
 - Keep the four columns in this order and with these colors: green Must, orange Should, yellow Could, red Won't.
-- Keep the line `MUST ~~~ SHOULD ~~~ COULD ~~~ WONT`. Those invisible links fix the left-to-right column order.
+- Use `flowchart TB` and declare the subgraphs in Must, Should, Could, Won't order. Unlinked subgraphs sit side by side in declaration order.
+- Inside each column, chain the nodes with invisible links on one line (`m1["A"] ~~~ m2["B"] ~~~ m3["C"]`). The chain stacks them vertically so each column reads top to bottom. Without it, Mermaid puts every node in one long row and shrinks the chart until it's unreadable.
+- Never link one column to another, or link nodes across columns. That merges the columns into one row.
+- Keep the `%%{init: ...}%%` line at the top. It sets a readable font size and tighter spacing.
 - Give every node a unique ID with its column's prefix (`m1`, `s1`, `c1`, `w1` and so on).
 - Wrap every feature label in double quotes, and don't use double quotes or the characters `<`, `>` and `#` inside a label.
 - If a column has no features, add one placeholder node with its own ID, e.g. `s0["—"]`. Mermaid drops empty subgraphs.
