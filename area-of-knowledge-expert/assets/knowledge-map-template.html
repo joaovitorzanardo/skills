@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knowledge Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/*
+  Knowledge Map — reference template for Agent E.
+  Mission Control · Telemetry · duotone ORANGE / BLUE. Tokens mirror DESIGN.md (DESIGN.md wins on visual values).
+  Agent E changes ONLY the JSON inside <script id="km-data">. Everything else is frozen.
+*/
+:root{
+  --background:#000000;--surface-lift:#0A0D12;--hairline:#1F2328;--line:#2E343B;--link-rest:#545B64;--ring-tick:#191D22;
+  --text:#F2F2F2;--text-body:#C9D1D9;--muted:#7D8590;--primary:#FF6B1A;--secondary:#3B82F6;
+  --display:"Orbitron",system-ui,sans-serif;--read:"Inter",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{margin:0;background:var(--background);color:var(--text);font-family:var(--read)}
+a{color:inherit}
+:focus-visible{outline:1px solid var(--secondary);outline-offset:4px}
+
+/* top-bar */
+.bar{position:fixed;inset:0 0 auto 0;height:64px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;z-index:10;border-bottom:1px solid var(--hairline);background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}
+.brand{font:400 11px var(--display);letter-spacing:.28em;color:var(--muted)}
+.brand b{color:var(--text);font-weight:500}
+.nav{display:flex;gap:36px;font:400 10px var(--display);letter-spacing:.26em}
+.nav a{color:var(--muted);text-decoration:none;padding:6px 0;border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.nav a:is(:hover,:focus-visible){color:var(--text)}
+.nav a.on{color:var(--text);border-bottom-color:var(--text)}
+
+/* map */
+#map{position:relative;height:100vh;min-height:640px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 55%,var(--surface-lift) 0%,var(--background) 65%)}
+.meta{font:500 10px var(--display);letter-spacing:.18em;color:var(--muted)}
+.tele{position:absolute;left:40px;top:92px;line-height:2.2;z-index:2}
+.hint{position:absolute;right:40px;bottom:28px;z-index:2}
+.down{position:absolute;left:40px;bottom:28px;text-decoration:none;z-index:2}
+.down:is(:hover,:focus-visible){color:var(--text)}
+#map svg{position:absolute;inset:0;width:100%;height:100%;user-select:none}
+svg text{pointer-events:none}
+.n{cursor:pointer;outline:none}
+.n:focus-visible .hit{stroke:var(--secondary);stroke-width:1}
+.root-t{font:400 15px var(--display);letter-spacing:.24em;fill:var(--text)}
+.sub-t{font:500 11px var(--display);letter-spacing:.14em;fill:var(--text)}
+.sub-i{font:500 10px var(--display);letter-spacing:.18em;fill:var(--muted)}
+.top-t{font:400 10.5px var(--display);letter-spacing:.1em;fill:var(--text)}
+.ring-t{font:400 8px var(--display);fill:var(--line)}
+svg a text{pointer-events:auto;cursor:pointer;transition:fill .2s}
+svg a:is(:hover,:focus-visible) text{fill:var(--secondary)!important;text-decoration:underline;text-underline-offset:5px}
+svg a:focus-visible{outline:none}
+.n,.e{transition:opacity .25s}
+.faded{opacity:.12}
+.spin{animation:spin 140s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* section heads */
+.sec{max-width:1160px;margin:0 auto;padding:120px 40px 40px}
+.kicker{font:400 10px var(--display);letter-spacing:.3em;color:var(--muted);margin:0 0 14px}
+.h1{font:400 28px var(--display);letter-spacing:.2em;margin:0 0 56px}
+
+/* overview: sticky-index-item + article */
+.ov{display:grid;grid-template-columns:220px minmax(0,720px);gap:72px}
+.index{position:sticky;top:112px;align-self:start;display:flex;flex-direction:column;gap:2px}
+.index a{display:flex;gap:14px;align-items:baseline;padding:9px 0 9px 14px;border-left:2px solid var(--hairline);
+  font:400 10.5px var(--display);letter-spacing:.14em;color:var(--muted);text-decoration:none;transition:color .2s,border-color .2s}
+.index a span{color:var(--muted)}
+.index a:is(:hover,:focus-visible){color:var(--secondary)}
+.index a.on{color:var(--text);border-left-color:var(--primary)}
+.index a.on span{color:var(--primary)}
+.article section{padding-bottom:56px;margin-bottom:56px;border-bottom:1px solid var(--hairline)}
+.article section:last-child{border-bottom:none}
+.article h2{display:flex;gap:16px;align-items:baseline;margin:0 0 20px;padding-left:16px;border-left:2px solid var(--primary);
+  font:500 15px var(--display);letter-spacing:.16em}
+.article h2 small{font:400 11px var(--display);color:var(--primary)}
+.article p{font:400 17px/1.75 var(--read);color:var(--text-body);margin:0 0 18px}
+.cite{color:var(--secondary);text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--secondary) 40%,transparent);text-underline-offset:3px;white-space:nowrap}
+.cite:is(:hover,:focus-visible){text-decoration-color:var(--secondary)}
+.cite-dead{color:var(--text-body);white-space:nowrap}
+.line{margin-top:20px;line-height:2}
+.line span{color:var(--text);margin-left:12px}
+.line a{text-decoration:none;margin-left:12px;color:var(--text)}
+.line a:is(:hover,:focus-visible){color:var(--secondary)}
+
+/* resources */
+.res-group{margin-bottom:64px}
+.res-group h3{display:flex;gap:16px;align-items:baseline;margin:0 0 8px;padding-left:16px;border-left:2px solid var(--primary);
+  font:500 13px var(--display);letter-spacing:.16em}
+.res-group h3 small{font:400 10px var(--display);color:var(--primary)}
+.res-group ul{list-style:none;margin:0;padding:0}
+.ref{display:grid;grid-template-columns:96px 1fr auto;gap:24px;align-items:baseline;padding:18px 16px;border-bottom:1px solid var(--hairline);transition:background .6s}
+.ref:focus{outline:none}
+.ref.flash{background:color-mix(in srgb,var(--secondary) 14%,transparent)}
+.tag{font:500 10px var(--display);letter-spacing:.16em;color:var(--primary);border:1px solid var(--line);padding:5px 8px;text-align:center}
+.cit{font:400 15px/1.6 var(--read);color:var(--text-body)}
+.cit b{color:var(--text);font-weight:600}
+.go{text-decoration:none;white-space:nowrap}
+.go:is(:hover,:focus-visible){color:var(--secondary)}
+
+footer{max-width:1160px;margin:0 auto;padding:40px 40px 80px;border-top:1px solid var(--hairline);display:flex;justify-content:space-between}
+footer a{text-decoration:none} footer a:is(:hover,:focus-visible){color:var(--text)}
+
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} .spin{animation:none} }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="brand">KNOWLEDGE MAP &nbsp;/&nbsp; <b id="brandArea"></b></div>
+  <nav class="nav" aria-label="Sections"><a href="#map" data-nav="map">MAP</a><a href="#overview" data-nav="overview">OVERVIEW</a><a href="#resources" data-nav="resources">RESOURCES</a></nav>
+</header>
+
+<section id="map">
+  <div class="tele meta" id="tele"></div>
+  <a class="down meta" href="#overview">SCROLL ↓ OVERVIEW + RESOURCES</a>
+  <div class="hint meta">CLICK DOT TO EXPAND · CLICK NAME TO READ · DRAG · CTRL+WHEEL TO ZOOM</div>
+  <svg id="svg" xmlns="http://www.w3.org/2000/svg" role="group">
+    <defs><filter id="glow" x="-200%" y="-200%" width="500%" height="500%">
+      <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter></defs>
+    <g id="ring" aria-hidden="true"></g><g id="view"><g id="edges" aria-hidden="true"></g><g id="nodes"></g></g>
+  </svg>
+</section>
+
+<section class="sec" id="overview">
+  <p class="kicker">01 / OVERVIEW</p>
+  <h1 class="h1" id="ovTitle"></h1>
+  <div class="ov"><nav class="index" id="index" aria-label="Overview index"></nav><div class="article" id="article"></div></div>
+</section>
+
+<section class="sec" id="resources">
+  <p class="kicker">02 / RESOURCES</p>
+  <h1 class="h1">RESOURCES</h1>
+  <div id="refs"></div>
+</section>
+
+<footer class="meta"><span id="foot"></span><a href="#map">↑ BACK TO MAP</a></footer>
+
+<!-- =====================================================================
+     DATA — the ONLY part Agent E writes. Pure JSON (no JS), see EXPERIENCE.md § Data Contract.
+     Serialize with a JSON encoder, then replace every "</" with "<\/".
+     ===================================================================== -->
+<script type="application/json" id="km-data">
+{
+  "area": "Computer Science",
+  "generated": "2026-10-21",
+  "intro": [
+    "Computer Science studies computation itself: what can be computed, how efficiently, and how to build reliable systems that do it. Its foundations were laid when <a class=\"cite\" href=\"#ref-turing1937\">(TURING, 1937)<\/a> formalized the idea of a mechanical procedure.",
+    "The field is usually split into a theoretical core, a systems layer that makes computation physical, and applied branches that put it to work. The six subfields below cover that spread."
+  ],
+  "subfields": [
+    {
+      "id": "theory",
+      "name": "Theory of Computation",
+      "topics": [
+        "Automata",
+        "Computability",
+        "Complexity Classes",
+        "Formal Languages",
+        "Lambda Calculus"
+      ],
+      "overview": [
+        "Asks what problems machines can solve at all, and at what cost, in a world shaped by Gödel's incompleteness results. Automata and formal languages classify machines by power; complexity theory sorts problems by the resources they need <a class=\"cite\" href=\"#ref-sipser2013\">(SIPSER, 2013)<\/a>."
+      ],
+      "connects": [
+        "algorithms",
+        "languages",
+        "ai"
+      ]
+    },
+    {
+      "id": "algorithms",
+      "name": "Algorithms & Data Structures",
+      "topics": [
+        "Complexity Analysis",
+        "Graph Algorithms",
+        "Dynamic Programming",
+        "Sorting & Searching",
+        "Trees & Hashing"
+      ],
+      "overview": [
+        "Studies step-by-step procedures and the structures that hold their data, with time and memory as the measure. The standard reference organizes it around design paradigms such as divide-and-conquer and dynamic programming <a class=\"cite\" href=\"#ref-cormen2022\">(CORMEN et al., 2022)<\/a>."
+      ],
+      "connects": [
+        "theory",
+        "ai"
+      ]
+    },
+    {
+      "id": "systems",
+      "name": "Computer Systems",
+      "topics": [
+        "Operating Systems",
+        "Computer Architecture",
+        "Networking",
+        "Distributed Systems",
+        "Concurrency"
+      ],
+      "overview": [
+        "Covers the layers that turn logic into running machines: processors, memory, operating systems and networks <a class=\"cite\" href=\"#ref-patterson2014\">(PATTERSON; HENNESSY, 2014)<\/a>."
+      ],
+      "connects": [
+        "languages",
+        "software"
+      ]
+    },
+    {
+      "id": "languages",
+      "name": "Programming Languages",
+      "topics": [
+        "Type Systems",
+        "Semantics",
+        "Compilers",
+        "Paradigms",
+        "Program Verification"
+      ],
+      "overview": [
+        "Designs the notations we program in and proves what they mean. Type systems catch whole classes of errors before a program runs <a class=\"cite\" href=\"#ref-pierce2002\">(PIERCE, 2002)<\/a>."
+      ],
+      "connects": [
+        "theory",
+        "systems",
+        "software"
+      ]
+    },
+    {
+      "id": "ai",
+      "name": "Artificial Intelligence",
+      "topics": [
+        "Search & Planning",
+        "Machine Learning",
+        "Neural Networks",
+        "Knowledge Representation",
+        "Reinforcement Learning"
+      ],
+      "overview": [
+        "Builds systems that perceive, reason and learn. Modern progress is driven by learned models such as the Transformer <a class=\"cite\" href=\"#ref-vaswani2017\">(VASWANI et al., 2017)<\/a>, on top of classical search and logic <a class=\"cite\" href=\"#ref-russell2020\">(RUSSELL; NORVIG, 2020)<\/a>."
+      ],
+      "connects": [
+        "theory",
+        "algorithms"
+      ]
+    },
+    {
+      "id": "software",
+      "name": "Software Engineering",
+      "topics": [
+        "Requirements",
+        "Software Architecture",
+        "Testing",
+        "Design Patterns",
+        "Version Control"
+      ],
+      "overview": [
+        "Turns programming into an engineering discipline: how teams specify, structure, test and evolve large systems over time <a class=\"cite\" href=\"#ref-sommerville2016\">(SOMMERVILLE, 2016)<\/a>."
+      ],
+      "connects": [
+        "systems",
+        "languages"
+      ]
+    }
+  ],
+  "resources": {
+    "theory": [
+      {
+        "id": "sipser2013",
+        "type": "BOOK",
+        "citation": "SIPSER, M. <b>Introduction to the theory of computation<\/b>. 3. ed. Boston: Cengage Learning, 2013.",
+        "url": ""
+      },
+      {
+        "id": "turing1937",
+        "type": "PAPER",
+        "citation": "TURING, A. M. On computable numbers, with an application to the Entscheidungsproblem. <b>Proceedings of the London Mathematical Society<\/b>, v. s2-42, n. 1, p. 230-265, 1937.",
+        "url": "https://doi.org/10.1112/plms/s2-42.1.230"
+      }
+    ],
+    "algorithms": [
+      {
+        "id": "cormen2022",
+        "type": "BOOK",
+        "citation": "CORMEN, T. H. et al. <b>Introduction to algorithms<\/b>. 4. ed. Cambridge: MIT Press, 2022.",
+        "url": ""
+      },
+      {
+        "id": "mit6006",
+        "type": "COURSE",
+        "citation": "MASSACHUSETTS INSTITUTE OF TECHNOLOGY. <b>6.006 Introduction to algorithms<\/b>. Cambridge: MIT OpenCourseWare, 2020.",
+        "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/"
+      }
+    ],
+    "systems": [
+      {
+        "id": "patterson2014",
+        "type": "BOOK",
+        "citation": "PATTERSON, D. A.; HENNESSY, J. L. <b>Computer organization and design<\/b>: the hardware/software interface. 5. ed. Waltham: Morgan Kaufmann, 2014.",
+        "url": ""
+      },
+      {
+        "id": "tanenbaum2015",
+        "type": "BOOK",
+        "citation": "TANENBAUM, A. S.; BOS, H. <b>Modern operating systems<\/b>. 4. ed. Boston: Pearson, 2015.",
+        "url": ""
+      }
+    ],
+    "languages": [
+      {
+        "id": "pierce2002",
+        "type": "BOOK",
+        "citation": "PIERCE, B. C. <b>Types and programming languages<\/b>. Cambridge: MIT Press, 2002.",
+        "url": ""
+      },
+      {
+        "id": "aho2006",
+        "type": "BOOK",
+        "citation": "AHO, A. V. et al. <b>Compilers<\/b>: principles, techniques, and tools. 2. ed. Boston: Pearson, 2006.",
+        "url": ""
+      }
+    ],
+    "ai": [
+      {
+        "id": "russell2020",
+        "type": "BOOK",
+        "citation": "RUSSELL, S.; NORVIG, P. <b>Artificial intelligence<\/b>: a modern approach. 4. ed. Hoboken: Pearson, 2020.",
+        "url": ""
+      },
+      {
+        "id": "vaswani2017",
+        "type": "PAPER",
+        "citation": "VASWANI, A. et al. Attention is all you need. In: ADVANCES IN NEURAL INFORMATION PROCESSING SYSTEMS, 30., 2017, Long Beach. <b>Proceedings<\/b> [...]. Red Hook: Curran Associates, 2017. p. 5998-6008.",
+        "url": "https://arxiv.org/abs/1706.03762"
+      }
+    ],
+    "software": [
+      {
+        "id": "sommerville2016",
+        "type": "BOOK",
+        "citation": "SOMMERVILLE, I. <b>Software engineering<\/b>. 10. ed. Boston: Pearson, 2016.",
+        "url": ""
+      },
+      {
+        "id": "gamma1994",
+        "type": "BOOK",
+        "citation": "GAMMA, E. et al. <b>Design patterns<\/b>: elements of reusable object-oriented software. Reading: Addison-Wesley, 1994.",
+        "url": ""
+      }
+    ]
+  }
+}
+</script>
+
+<script>
+/* ---------- frozen code below: do not edit per area ---------- */
+const RAW = JSON.parse(document.getElementById("km-data").textContent);
+const css = getComputedStyle(document.documentElement), V = n => css.getPropertyValue(n).trim();
+const COL = {primary:V("--primary"), secondary:V("--secondary"), text:V("--text"), hairline:V("--hairline"), line:V("--line"), linkRest:V("--link-rest"), tick:V("--ring-tick"), bg:V("--background")};
+const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, a={}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); p && p.appendChild(e); return e; };
+const pad = i => String(i).padStart(2,"0");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const slug = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+
+/* ---------- safety net: normalize DATA (Agent E validates first; this only prevents a broken page) ---------- */
+function normalize(d){
+  const warn = m => console.warn("[knowledge-map] " + m);
+  const out = {area: d.area || "Untitled Area", generated: d.generated || "", intro: d.intro || [], resources: {}};
+  let subs = d.subfields || [];
+  if (subs.length > 6) { warn(`${subs.length} subfields, keeping the first 6`); subs = subs.slice(0,6); }
+  const seen = new Set();
+  out.subfields = subs.map(s => {
+    let id = s.id || slug(s.name); while (seen.has(id)) id += "-2"; seen.add(id);
+    let topics = s.topics || []; if (topics.length > 5) { warn(`${s.name}: ${topics.length} topics, keeping 5`); topics = topics.slice(0,5); }
+    return {id, name: s.name, topics, overview: s.overview || [], connects: s.connects || []};
+  });
+  const ids = new Set(out.subfields.map(s => s.id));
+  out.subfields.forEach(s => s.connects = s.connects.filter(c => { const ok = ids.has(c) && c !== s.id; if (!ok) warn(`${s.id}: unknown connects id "${c}" dropped`); return ok; }));
+  const refIds = new Set();
+  Object.keys(d.resources || {}).forEach(k => {
+    if (!ids.has(k)) { warn(`resources for unknown subfield "${k}" dropped`); return; }
+    out.resources[k] = d.resources[k].filter(r => { if (refIds.has(r.id)) { warn(`duplicate resource id "${r.id}" dropped`); return false; } refIds.add(r.id); return true; });
+  });
+  return out;
+}
+const DATA = normalize(RAW), SF = DATA.subfields, N = SF.length;
+const idxOf = id => SF.findIndex(s => s.id === id);
+const srcCount = s => (DATA.resources[s.id] || []).length;
+const totalTopics = SF.reduce((a,s)=>a+s.topics.length,0), totalSrc = SF.reduce((a,s)=>a+srcCount(s),0);
+
+// undirected, de-duplicated edge-link list from each subfield's "connects"
+const LINKS = [];
+SF.forEach((s,i)=>s.connects.forEach(id=>{ const j = idxOf(id); if (!LINKS.some(([a,b])=>(a===i&&b===j)||(a===j&&b===i))) LINKS.push([i,j]); }));
+
+/* ---------- top-bar / telemetry-readout / footer ---------- */
+document.title = DATA.area + " · Knowledge Map";
+$("brandArea").textContent = DATA.area.toUpperCase();
+$("svg").setAttribute("aria-label", DATA.area + " knowledge map");
+$("tele").innerHTML = `NODES ${pad(N+1)} · EDGES ${pad(LINKS.length)} · TOPICS ${pad(totalTopics)} · SOURCES ${pad(totalSrc)}<br><span id="zoomv">ZOOM 1.00×</span>`;
+$("foot").textContent = `GENERATED ${DATA.generated} · AREA-OF-KNOWLEDGE-EXPERT`;
+
+/* =================== MAP =================== */
+const svg = $("svg");
+let nodes=[], edges=[], expanded=new Set(), hover=null, view={x:0,y:0,k:1}, geo={}, drag=null, dom={}, maxTopicW=0;
+
+// widest topic label, used to keep fanned-out topics inside the viewport
+function measureTopics(){
+  const c = document.createElement("canvas").getContext("2d"); c.font = '400 10.5px "Orbitron"';
+  SF.forEach(s => s.topics.forEach(t => { const u = t.toUpperCase(); maxTopicW = Math.max(maxTopicW, c.measureText(u).width + u.length*1.05); }));
+}
+function geometry(){
+  const b = svg.getBoundingClientRect(), W = b.width, H = b.height, tr = 120;
+  const rxFit = W/2 - tr - maxTopicW - 11 - 40;
+  geo = {rx: Math.max(220, Math.min(W*0.28, 560, rxFit)), ry: Math.min((H-64)*0.32, 300), tr};
+  view.x = W/2; view.y = 64 + (H-64)/2;
+}
+// subfields evenly on a wide ellipse, offset half a step so none sits straight above the center
+const subSlot = i => { const a = (-90 + 360/N*(i+0.5))*Math.PI/180; return {x:geo.rx*Math.cos(a), y:geo.ry*Math.sin(a)}; };
+// topics fan in an even arc pointing horizontally away from the center
+function topicSlot(p, k, count){
+  const out = p.x >= 0 ? 0 : Math.PI;
+  const tilt = Math.atan2(p.y, Math.abs(p.x)||1) * 0.5 * (p.x >= 0 ? 1 : -1);
+  const a = out + tilt + (-(count-1)/2*28 + 28*k)*Math.PI/180;
+  return {x:p.x + geo.tr*Math.cos(a), y:p.y + geo.tr*Math.sin(a)};
+}
+const byId = id => nodes.find(n=>n.id===id);
+function target(n){
+  if (n.kind==="root") return {x:0,y:0};
+  if (n.kind==="sub") return subSlot(n.i);
+  return topicSlot(byId(n.parent), n.k, SF[n.i].topics.length);
+}
+// split long names onto two lines for map labels
+function lines(name){
+  const up = name.toUpperCase(); if (up.length <= 18) return [up];
+  const w = up.split(" "); let a = "";
+  while (w.length && (a + " " + w[0]).trim().length <= Math.ceil(up.length/2)+2) a = (a + " " + w.shift()).trim();
+  return w.length ? [a, w.join(" ")] : [a];
+}
+
+function buildGraph(){
+  nodes = [{id:"root",kind:"root",x:0,y:0,vx:0,vy:0}];
+  SF.forEach((s,i)=>{ const p = subSlot(i); nodes.push({id:"s"+i,kind:"sub",i,x:p.x,y:p.y,vx:0,vy:0}); });
+  edges = SF.map((_,i)=>({a:"root",b:"s"+i,kind:"spoke"})).concat(LINKS.map(([a,b])=>({a:"s"+a,b:"s"+b,kind:"link"})));
+  buildDom();
+}
+function toggle(i){
+  const sid="s"+i, refocus = document.activeElement === dom[sid];
+  if (expanded.has(i)){ expanded.delete(i); nodes=nodes.filter(n=>n.parent!==sid); edges=edges.filter(e=>e.b.indexOf(sid+"t")!==0); }
+  else { expanded.add(i); const s=byId(sid);
+    SF[i].topics.forEach((t,k)=>{ nodes.push({id:sid+"t"+k,kind:"topic",parent:sid,i,k,label:t,x:s.x,y:s.y,vx:0,vy:0}); edges.push({a:sid,b:sid+"t"+k,kind:"topic"}); }); }
+  buildDom();
+  if (refocus) dom[sid].focus();
+}
+function buildDom(){
+  const E=$("edges"), Nn=$("nodes"); E.innerHTML=Nn.innerHTML=""; dom={};
+  edges.forEach(e=>{ dom["e:"+e.a+"-"+e.b]=el("line",{class:"e"},E); });
+  nodes.forEach(n=>{
+    const g=el("g",{class:"n","data-id":n.id},Nn); dom[n.id]=g;
+    el("circle",{class:"hit",r:n.kind==="topic"?12:24,fill:"transparent"},g);
+    if (n.kind==="root"){
+      el("circle",{r:72,fill:COL.bg,stroke:COL.text},g); el("circle",{r:80,fill:"none",stroke:COL.hairline},g);
+      const a = el("a",{href:"#overview"},g), ws = lines(DATA.area);
+      ws.forEach((w,k)=>{ el("text",{y:(k-(ws.length-1)/2)*20+5,"text-anchor":"middle",class:"root-t"},a).textContent=w; });
+    } else if (n.kind==="sub"){
+      const open=expanded.has(n.i), s=SF[n.i];
+      g.setAttribute("tabindex","0"); g.setAttribute("role","button");
+      g.setAttribute("aria-expanded", open); g.setAttribute("aria-label", `${s.name}: ${open?"hide":"show"} ${s.topics.length} topics`);
+      if (open) el("circle",{r:17,fill:"none",stroke:COL.primary,opacity:.8},g);
+      el("circle",{r:open?8:6.5,fill:COL.primary,filter:"url(#glow)"},g);
+      el("text",{y:-22,"text-anchor":"middle",class:"sub-i"},g).textContent = `${pad(n.i+1)} · ${s.topics.length} TOPICS · ${srcCount(s)} SOURCES`;
+      const a = el("a",{href:"#sf-"+s.id},g);
+      const t = el("text",{y:32,"text-anchor":"middle",class:"sub-t",style:open?`fill:${COL.primary}`:""},a);
+      lines(s.name).forEach((l,k)=>{ el("tspan",{x:0,dy:k?15:0},t).textContent=l; });
+    } else {
+      el("rect",{x:-3,y:-3,width:6,height:6,fill:COL.secondary},g);
+      g._lbl=el("text",{class:"top-t",y:4},g); g._lbl.textContent=n.label.toUpperCase();
+    }
+  });
+}
+const neighbors = id => { const s=new Set([id]); edges.forEach(e=>{ if(e.a===id)s.add(e.b); if(e.b===id)s.add(e.a); }); return s; };
+
+// motion: elastic spring back to the slot; reduced motion snaps
+function tick(){
+  for (const n of nodes){
+    if (drag && drag.n===n && drag.moved) continue;
+    const t=target(n);
+    if (RM){ n.x=t.x; n.y=t.y; continue; }
+    n.vx=(n.vx+(t.x-n.x)*0.09)*0.78; n.vy=(n.vy+(t.y-n.y)*0.09)*0.78; n.x+=n.vx; n.y+=n.vy;
+  }
+}
+function draw(){
+  $("view").setAttribute("transform",`translate(${view.x},${view.y}) scale(${view.k})`);
+  const zv=$("zoomv"); if (zv) zv.textContent="ZOOM "+view.k.toFixed(2)+"×";
+  const nb=hover?neighbors(hover):null;
+  edges.forEach(e=>{
+    const L=dom["e:"+e.a+"-"+e.b], A=byId(e.a), B=byId(e.b);
+    L.setAttribute("x1",A.x); L.setAttribute("y1",A.y); L.setAttribute("x2",B.x); L.setAttribute("y2",B.y);
+    const hot=hover&&(e.a===hover||e.b===hover);
+    L.setAttribute("stroke", e.kind==="topic"||hot ? COL.secondary : e.kind==="spoke" ? COL.hairline : COL.linkRest);
+    L.setAttribute("stroke-width",hot?1.5:1); L.setAttribute("opacity",e.kind==="topic"&&!hot?.7:1);
+    L.setAttribute("filter",hot?"url(#glow)":""); L.classList.toggle("faded",!!hover&&!hot);
+  });
+  nodes.forEach(n=>{
+    const g=dom[n.id]; g.setAttribute("transform",`translate(${n.x},${n.y})`);
+    g.classList.toggle("faded",!!nb&&!nb.has(n.id));
+    if (n.kind==="topic"){
+      const p=byId(n.parent), right=n.x>=p.x;
+      g._lbl.setAttribute("x",right?11:-11); g._lbl.setAttribute("text-anchor",right?"start":"end");
+      g.style.opacity = g.classList.contains("faded") ? "" : Math.min(1, Math.hypot(n.x-p.x,n.y-p.y)/geo.tr);
+      g._lbl.style.opacity = view.k>0.75||hover===n.parent||hover===n.id ? 1 : 0;
+    }
+  });
+}
+function ring(){
+  const g=$("ring"); g.innerHTML="";
+  const b=svg.getBoundingClientRect(), r=Math.min(b.width*0.42,(b.height-64)*0.62), cx=view.x, cy=view.y;
+  const rot=el("g",{class:"spin",style:`transform-origin:${cx}px ${cy}px`},g);
+  for (let d=0; d<360; d+=4){
+    const a=d*Math.PI/180, r2=r+(d%40===0?12:5);
+    el("line",{x1:cx+r*Math.cos(a),y1:cy+r*Math.sin(a),x2:cx+r2*Math.cos(a),y2:cy+r2*Math.sin(a),stroke:d%40===0?COL.line:COL.tick},rot);
+    if (d%40===0) el("text",{x:cx+(r+26)*Math.cos(a),y:cy+(r+26)*Math.sin(a)+3,"text-anchor":"middle",class:"ring-t"},rot).textContent=String(d).padStart(3,"0");
+  }
+}
+function loop(){ tick(); draw(); requestAnimationFrame(loop); }
+
+// pointer: names are real links (navigate on click); dot press without moving toggles; drag springs back
+const toWorld=(x,y)=>{ const b=svg.getBoundingClientRect(); return {x:(x-b.left-view.x)/view.k, y:(y-b.top-view.y)/view.k}; };
+svg.addEventListener("pointerdown",e=>{
+  if (e.target.closest("a")) return;
+  const g=e.target.closest(".n"); if (!g) return;
+  drag={n:byId(g.dataset.id),sx:e.clientX,sy:e.clientY,moved:false}; svg.setPointerCapture(e.pointerId);
+});
+svg.addEventListener("pointermove",e=>{
+  if (drag){ if (!drag.moved && Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<4) return;
+    drag.moved=true; const p=toWorld(e.clientX,e.clientY); drag.n.x=p.x; drag.n.y=p.y; drag.n.vx=drag.n.vy=0; }
+  else { const g=e.target.closest(".n"); hover=g?g.dataset.id:null; }
+});
+svg.addEventListener("pointerleave",()=>{ if(!drag) hover=null; });
+svg.addEventListener("pointerup",()=>{ if (drag&&!drag.moved&&drag.n.kind==="sub") toggle(drag.n.i); drag=null; });
+// keyboard: Enter/Space toggles a focused subfield; focus highlights its neighbors like hover
+svg.addEventListener("keydown",e=>{
+  const g=e.target.closest && e.target.closest(".n[role=button]");
+  if (g && e.target===g && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); toggle(byId(g.dataset.id).i); }
+});
+svg.addEventListener("focusin",e=>{ const g=e.target.closest(".n"); if (g) hover=g.dataset.id; });
+svg.addEventListener("focusout",()=>{ hover=null; });
+svg.addEventListener("wheel",e=>{ if(!e.ctrlKey&&!e.metaKey) return; e.preventDefault(); view.k=Math.min(3,Math.max(0.5,view.k*Math.exp(-e.deltaY*0.0015))); },{passive:false});
+addEventListener("resize",()=>{ const k=view.k; geometry(); view.k=k; ring(); });
+
+/* =================== OVERVIEW =================== */
+$("ovTitle").textContent = DATA.area.toUpperCase();
+$("index").innerHTML = `<a href="#sf-intro" data-sec="sf-intro"><span>00</span>INTRODUCTION</a>` +
+  SF.map((s,i)=>`<a href="#sf-${s.id}" data-sec="sf-${s.id}"><span>${pad(i+1)}</span>${esc(s.name.toUpperCase())}</a>`).join("");
+$("article").innerHTML = `<section id="sf-intro"><h2><small>00</small>INTRODUCTION</h2>${DATA.intro.map(p=>`<p>${p}</p>`).join("")}</section>` +
+  SF.map((s,i)=>`<section id="sf-${s.id}">
+    <h2><small>${pad(i+1)}</small>${esc(s.name.toUpperCase())}</h2>
+    ${s.overview.map(p=>`<p>${p}</p>`).join("")}
+    ${s.topics.length ? `<div class="line meta">TOPICS${s.topics.map(t=>`<span>${esc(t.toUpperCase())}</span>`).join("")}</div>` : ""}
+    ${s.connects.length ? `<div class="line meta">CONNECTS TO${s.connects.map(id=>{const j=idxOf(id); return `<a href="#sf-${id}">${pad(j+1)} ${esc(SF[j].name.toUpperCase())}</a>`;}).join("")}</div>` : ""}
+  </section>`).join("");
+
+/* =================== RESOURCES =================== */
+$("refs").innerHTML = SF.map((s,i)=>{
+  const list = DATA.resources[s.id] || [];
+  return `<div class="res-group">
+    <h3><small>${pad(i+1)}</small>${esc(s.name.toUpperCase())}</h3>
+    <ul>${list.length ? list.map(r=>`<li class="ref" id="ref-${esc(r.id)}" tabindex="-1">
+        <span class="tag">${esc(r.type)}</span><span class="cit">${r.citation}</span>
+        ${r.url ? `<a class="go meta" href="${esc(r.url)}" target="_blank" rel="noopener" aria-label="Open source (new tab)">OPEN <span aria-hidden="true">↗</span></a>` : `<span></span>`}
+      </li>`).join("") : `<li class="ref"><span></span><span class="cit" style="color:var(--muted)">No sources found for this subfield.</span><span></span></li>`}</ul>
+  </div>`;
+}).join("");
+
+// citations with no matching reference become plain text
+document.querySelectorAll("a.cite").forEach(c=>{
+  if (!document.querySelector(c.getAttribute("href"))) {
+    console.warn("[knowledge-map] citation with no reference: " + c.getAttribute("href"));
+    const s=document.createElement("span"); s.className="cite-dead"; s.textContent=c.textContent; c.replaceWith(s);
+  }
+});
+// in-text citation → focus the reference, push history (Back returns), flash it
+document.addEventListener("click",e=>{
+  const c=e.target.closest("a.cite"); if (!c) return;
+  const href=c.getAttribute("href"), r=document.querySelector(href); if (!r) return;
+  e.preventDefault(); history.pushState(null,"",href);
+  r.scrollIntoView({block:"center"}); r.focus({preventScroll:true});
+  r.classList.remove("flash"); void r.offsetWidth; r.classList.add("flash"); setTimeout(()=>r.classList.remove("flash"),1600);
+});
+
+/* =================== scroll-spy: nav + sticky index =================== */
+const spy = new IntersectionObserver(es=>es.forEach(e=>{
+  if (!e.isIntersecting) return;
+  const id=e.target.id;
+  if (["map","overview","resources"].includes(id)) document.querySelectorAll("[data-nav]").forEach(a=>a.classList.toggle("on",a.dataset.nav===id));
+  else document.querySelectorAll("[data-sec]").forEach(a=>a.classList.toggle("on",a.dataset.sec===id));
+}),{rootMargin:"-45% 0px -50% 0px"});
+["map","overview","resources"].forEach(id=>spy.observe($(id)));
+document.querySelectorAll(".article section").forEach(s=>spy.observe(s));
+
+document.fonts.ready.then(()=>{ measureTopics(); geometry(); ring(); buildGraph(); loop(); });
+</script>
+</body>
+</html>
