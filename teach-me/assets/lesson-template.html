@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="__TM_LANG__">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TM_TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!--__TM_LIBS__-->
+<style>
+/*
+  teach-me lesson template. FROZEN: build_lesson.py only replaces the __TM_*__ markers.
+  Lesson widgets should colour themselves with the variables below so they work in light and dark mode.
+*/
+:root{
+  --bg:#FBFAF7;--surface:#FFFFFF;--surface-2:#F3F1EC;--text:#1F2328;--text-soft:#3D4248;--muted:#6B6F76;--line:#E4E1DA;
+  --accent:#2F6FEB;--accent-2:#D9622B;--good:#1F883D;--bad:#CF222E;
+  --good-bg:rgba(31,136,61,.09);--bad-bg:rgba(207,34,46,.08);--accent-bg:rgba(47,111,235,.08);--accent-2-bg:rgba(217,98,43,.09);
+  --ui:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--read:"Source Serif 4",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0F1115;--surface:#171A20;--surface-2:#1E222A;--text:#E8E6E3;--text-soft:#C9CCD1;--muted:#9AA0A6;--line:#2A2E35;
+  --accent:#6EA8FE;--accent-2:#FF8A4C;--good:#3FB950;--bad:#F85149;
+  --good-bg:rgba(63,185,80,.12);--bad-bg:rgba(248,81,73,.12);--accent-bg:rgba(110,168,254,.10);--accent-2-bg:rgba(255,138,76,.11);
+  color-scheme:dark;
+}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--bg);color:var(--text);font:400 18px/1.7 var(--read);-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+#progress{position:fixed;inset:0 0 auto 0;height:3px;background:var(--accent);transform-origin:0 50%;transform:scaleX(0);z-index:20}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr);max-width:1180px;margin:0 auto;padding:0 16px}
+@media (min-width:1100px){.layout{grid-template-columns:230px minmax(0,740px);gap:64px;padding:0 40px}}
+nav.toc{display:none}
+@media (min-width:1100px){nav.toc{display:block;position:sticky;top:48px;align-self:start;margin-top:120px;font:500 13px/1.4 var(--ui)}}
+.toc p{margin:0 0 12px;font:600 11px var(--ui);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.toc a{display:block;padding:7px 0 7px 14px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--text)}
+.toc a.on{color:var(--text);border-left-color:var(--accent)}
+main{min-width:0;padding-bottom:120px}
+
+header.lesson-head{padding:72px 0 32px;border-bottom:1px solid var(--line);margin-bottom:40px}
+.kicker{font:600 12px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--accent-2);margin:0 0 14px}
+h1{font:700 clamp(30px,5vw,42px)/1.15 var(--ui);letter-spacing:-.02em;margin:0 0 16px}
+.meta{font:500 14px var(--ui);color:var(--muted);display:flex;gap:18px;flex-wrap:wrap}
+.objectives{margin:28px 0 0;padding:20px 24px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.objectives p{margin:0 0 8px;font:600 13px var(--ui);color:var(--muted)}
+.objectives ul{margin:0;padding-left:20px;font-size:17px}
+
+#content section{margin:0 0 56px}
+#content h2{font:700 26px/1.25 var(--ui);letter-spacing:-.01em;margin:0 0 18px}
+#content h3{font:600 20px/1.3 var(--ui);margin:32px 0 10px}
+#content p,#content li{color:var(--text-soft)}
+#content b,#content strong{color:var(--text)}
+dfn{font-style:normal;font-weight:600;color:var(--text);background:linear-gradient(transparent 62%,var(--accent-bg) 0)}
+code{font:400 .86em var(--mono);background:var(--surface-2);padding:.12em .38em;border-radius:5px}
+pre{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:15px;line-height:1.55}
+pre code{background:none;padding:0}
+a.cite{font:500 .8em var(--ui);text-decoration:none;color:var(--accent);white-space:nowrap}
+a.cite:hover{text-decoration:underline}
+img,svg,canvas,video{max-width:100%}
+figure{margin:32px 0;padding:20px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+figure svg{display:block;width:100%;height:auto}
+figcaption{margin-top:12px;font:400 14px/1.5 var(--ui);color:var(--muted)}
+.callout{margin:24px 0;padding:16px 20px;border-left:4px solid var(--accent);background:var(--accent-bg);border-radius:0 10px 10px 0}
+.callout p{margin:.4em 0}
+.callout.analogy{border-color:var(--accent-2);background:var(--accent-2-bg)}
+.callout.warn{border-color:var(--bad);background:var(--bad-bg)}
+.callout.example{border-color:var(--good);background:var(--good-bg)}
+details.think{margin:24px 0;border:1px dashed var(--accent);border-radius:10px;padding:12px 18px;background:var(--surface)}
+details.think summary{cursor:pointer;font:600 15px var(--ui);color:var(--accent)}
+details.think[open] summary{margin-bottom:8px}
+.widget{margin:32px 0;padding:20px;background:var(--surface);border:1px solid var(--line);border-radius:12px;font:400 15px/1.5 var(--ui)}
+.widget label{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0}
+.widget input[type=range]{flex:1;min-width:160px;accent-color:var(--accent)}
+.widget button,.btn{font:600 14px var(--ui);padding:9px 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);cursor:pointer}
+.widget button:hover,.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.5;cursor:default}
+table{border-collapse:collapse;width:100%;font:400 15px/1.5 var(--ui);margin:24px 0}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:4px 0}
+
+/* practice */
+#practice{margin-top:72px;padding-top:40px;border-top:1px solid var(--line)}
+.sec-h{font:700 26px/1.25 var(--ui);margin:0 0 8px}
+.sec-sub{font:400 15px/1.5 var(--ui);color:var(--muted);margin:0 0 28px}
+.q{margin:0 0 20px;padding:20px 22px;background:var(--surface);border:1px solid var(--line);border-radius:12px;font:400 16px/1.55 var(--ui)}
+.q-n{font:600 12px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.q-p{margin:0 0 14px;color:var(--text)}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;margin:6px 0;border:1px solid var(--line);border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--accent)}
+.opt input{margin-top:4px;accent-color:var(--accent)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg)}
+.locked .opt{cursor:default}
+.locked .opt:hover:not(.ok):not(.bad){border-color:var(--line)}
+textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:400 15px/1.5 var(--ui);resize:vertical}
+.fb{margin-top:12px;padding:12px 14px;border-radius:8px;background:var(--surface-2);font-size:15px}
+.fb b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:28px 0}
+.note{font:400 14px var(--ui);color:var(--muted)}
+#results{display:none;margin-top:28px;padding:22px;border:2px solid var(--accent);border-radius:12px;background:var(--surface);font-family:var(--ui)}
+#results h3{margin:0 0 6px;font:700 20px var(--ui)}
+#results pre{white-space:pre-wrap;word-break:break-all;font-size:13px;max-height:180px}
+.score{font:700 15px var(--ui);margin:0 0 12px}
+
+/* references */
+#references{margin-top:72px;padding-top:40px;border-top:1px solid var(--line)}
+#references ol{padding-left:22px;font:400 15px/1.6 var(--ui);color:var(--text-soft)}
+#references li{margin:0 0 12px;scroll-margin-top:24px}
+#references li:target{background:var(--accent-bg);border-radius:6px}
+#references a.open{font-weight:600;text-decoration:none;white-space:nowrap}
+@media print{nav.toc,#progress,.actions{display:none}}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div class="layout">
+  <nav class="toc" aria-label="Contents"><p id="toc-h"></p><div id="toc"></div></nav>
+  <main>
+    <header class="lesson-head">
+      <p class="kicker" id="kicker"></p>
+      <h1 id="title"></h1>
+      <div class="meta" id="meta"></div>
+      <div class="objectives"><p id="obj-h"></p><ul id="objectives"></ul></div>
+    </header>
+
+    <article id="content">
+<!--__TM_CONTENT__-->
+    </article>
+
+    <section id="practice" aria-labelledby="practice-h">
+      <h2 class="sec-h" id="practice-h"></h2>
+      <p class="sec-sub" id="practice-sub"></p>
+      <form id="quiz" novalidate></form>
+      <div class="actions">
+        <button class="btn primary" id="submit" type="button"></button>
+        <span class="note" id="answered"></span>
+      </div>
+      <div id="results" role="region" aria-live="polite">
+        <h3 id="res-h"></h3>
+        <p class="score" id="score"></p>
+        <p class="note" id="res-how"></p>
+        <pre id="block"></pre>
+        <div class="actions"><button class="btn primary" id="copy" type="button"></button><span class="note" id="copied"></span></div>
+      </div>
+    </section>
+
+    <section id="references" aria-labelledby="ref-h">
+      <h2 class="sec-h" id="ref-h"></h2>
+      <ol id="ref-list"></ol>
+    </section>
+  </main>
+</div>
+
+<script type="application/json" id="tm-meta">__TM_META__</script>
+<script type="text/plain" id="tm-practice">__TM_PRACTICE__</script>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  const meta = JSON.parse($("#tm-meta").textContent);
+  const bytes = Uint8Array.from(atob($("#tm-practice").textContent.trim()), (c) => c.charCodeAt(0));
+  const P = JSON.parse(new TextDecoder().decode(bytes));
+
+  const UI = {
+    en: { toc: "Contents", obj: "By the end of this lesson you will be able to", min: "min reading", qs: "questions",
+          lesson: "Lesson", remedial: "Review", practice: "Practice",
+          psub: "Answer on your own first, without scrolling back. Then submit, copy the results and paste them into Claude.",
+          q: "Question", written: "Written answer", submit: "Submit answers", left: (n) => `${n} unanswered`,
+          all: "All answered", confirm: (n) => `${n} question(s) are unanswered. Submit anyway?`,
+          resH: "Your results", mc: (a, b) => `Multiple choice: ${a} / ${b} correct`, wr: (n) => ` · ${n} written answer(s) to be graded by Claude`,
+          how: "Click the button, then paste the block into your conversation with Claude. It will grade your answers and prepare what comes next.",
+          copy: "Copy results", copied: "Copied. Now paste it into Claude.", copyFail: "Select the text above and copy it manually.",
+          why: "Explanation", model: "Model answer", refs: "References", open: "Open ↗", placeholder: "Write your answer in your own words…" },
+    pt: { toc: "Conteúdo", obj: "Ao final desta lição você será capaz de", min: "min de leitura", qs: "questões",
+          lesson: "Lição", remedial: "Revisão", practice: "Prática",
+          psub: "Responda sozinho primeiro, sem voltar no texto. Depois envie, copie os resultados e cole no Claude.",
+          q: "Questão", written: "Resposta escrita", submit: "Enviar respostas", left: (n) => `${n} sem resposta`,
+          all: "Todas respondidas", confirm: (n) => `${n} questão(ões) sem resposta. Enviar mesmo assim?`,
+          resH: "Seus resultados", mc: (a, b) => `Múltipla escolha: ${a} / ${b} corretas`, wr: (n) => ` · ${n} resposta(s) escrita(s) para o Claude corrigir`,
+          how: "Clique no botão e cole o bloco na conversa com o Claude. Ele corrige suas respostas e prepara o próximo passo.",
+          copy: "Copiar resultados", copied: "Copiado. Agora cole no Claude.", copyFail: "Selecione o texto acima e copie manualmente.",
+          why: "Explicação", model: "Resposta modelo", refs: "Referências", open: "Abrir ↗", placeholder: "Escreva sua resposta com suas palavras…" },
+  };
+  const T = UI[(meta.language || "en").slice(0, 2).toLowerCase()] || UI.en;
+
+  // ---- header
+  const label = meta.kind === "remedial" ? `${T.remedial} · ${T.lesson} ${meta.number}` : `${T.lesson} ${meta.number}`;
+  $("#kicker").textContent = `${meta.topic} · ${label}`;
+  $("#title").textContent = meta.title;
+  $("#meta").innerHTML = `<span>~${meta.minutes} ${T.min}</span><span>${P.questions.length} ${T.qs}</span>`;
+  $("#obj-h").textContent = T.obj;
+  meta.objectives.forEach((o) => $("#objectives").append(el("li", null, esc(o))));
+  $("#practice-h").textContent = T.practice;
+  $("#practice-sub").textContent = T.psub;
+  $("#ref-h").textContent = T.refs;
+  $("#toc-h").textContent = T.toc;
+  $("#submit").textContent = T.submit;
+  $("#res-h").textContent = T.resH;
+  $("#res-how").textContent = T.how;
+  $("#copy").textContent = T.copy;
+
+  // ---- references
+  meta.references.forEach((r) => {
+    const li = el("li", null, r.citation_html + (r.url ? ` <a class="open" href="${esc(r.url)}" target="_blank" rel="noopener">${T.open}</a>` : ""));
+    li.id = `ref-${r.id}`;
+    $("#ref-list").append(li);
+  });
+
+  // ---- table of contents + reading progress
+  const heads = [...document.querySelectorAll("#content section > h2")];
+  heads.forEach((h, i) => { if (!h.id) h.id = `s${i + 1}`; });
+  const tocItems = [...heads.map((h) => [h.id, h.textContent]), ["practice", T.practice], ["references", T.refs]];
+  tocItems.forEach(([id, text]) => { const a = el("a"); a.href = `#${id}`; a.textContent = text; $("#toc").append(a); });
+  const targets = tocItems.map(([id]) => document.getElementById(id));
+  const links = [...document.querySelectorAll("#toc a")];
+  const onScroll = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    $("#progress").style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`;
+    let cur = 0;
+    targets.forEach((t, i) => { if (t && t.getBoundingClientRect().top < innerHeight * 0.3) cur = i; });
+    links.forEach((a, i) => a.classList.toggle("on", i === cur));
+  };
+  addEventListener("scroll", onScroll, { passive: true });
+
+  // ---- practice
+  const KEY = `teach-me:${P.course}:${P.lesson}`;
+  let state = { answers: {}, submitted: null };
+  try { state = Object.assign(state, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+
+  const quiz = $("#quiz");
+  P.questions.forEach((q, i) => {
+    const box = el("div", "q");
+    box.id = `q-${q.id}`;
+    box.append(el("p", "q-n", `${T.q} ${i + 1}${q.type === "written" ? " · " + T.written : ""}`));
+    box.append(el("div", "q-p", q.prompt));
+    if (q.type === "mc") {
+      q.options.forEach((o, j) => {
+        const lab = el("label", "opt");
+        const inp = el("input");
+        inp.type = "radio"; inp.name = q.id; inp.value = j;
+        if (state.answers[q.id] === j) inp.checked = true;
+        inp.addEventListener("change", () => { state.answers[q.id] = j; save(); count(); });
+        lab.append(inp, el("span", null, o));
+        box.append(lab);
+      });
+    } else {
+      const ta = el("textarea");
+      ta.name = q.id; ta.placeholder = T.placeholder; ta.value = state.answers[q.id] || "";
+      ta.addEventListener("input", () => { state.answers[q.id] = ta.value; save(); count(); });
+      box.append(ta);
+    }
+    quiz.append(box);
+  });
+
+  const answered = (q) => { const a = state.answers[q.id]; return q.type === "mc" ? Number.isInteger(a) : !!(a && a.trim()); };
+  const count = () => {
+    const left = P.questions.filter((q) => !answered(q)).length;
+    $("#answered").textContent = state.submitted ? "" : left ? T.left(left) : T.all;
+  };
+
+  const block = () => {
+    const answers = {};
+    P.questions.forEach((q) => { const a = state.answers[q.id]; answers[q.id] = answered(q) ? (q.type === "mc" ? a : a.trim()) : null; });
+    return "TEACH-ME RESULTS v1\n" + JSON.stringify({ course: P.course, lesson: P.lesson, submitted: state.submitted, answers });
+  };
+
+  const showResults = () => {
+    quiz.classList.add("locked");
+    quiz.querySelectorAll("input,textarea").forEach((x) => (x.disabled = true));
+    $("#submit").disabled = true;
+    let ok = 0, mc = 0, wr = 0;
+    P.questions.forEach((q) => {
+      const box = document.getElementById(`q-${q.id}`);
+      if (q.type === "mc") {
+        mc++;
+        const opts = box.querySelectorAll(".opt");
+        const a = state.answers[q.id];
+        opts[q.answer].classList.add("ok");
+        if (a === q.answer) ok++; else if (Number.isInteger(a) && opts[a]) opts[a].classList.add("bad");
+        box.append(el("div", "fb", `<b>${T.why}</b>${q.explanation}`));
+      } else {
+        wr++;
+        box.append(el("div", "fb", `<b>${T.model}</b>${q.model_answer}`));
+      }
+    });
+    $("#score").textContent = (mc ? T.mc(ok, mc) : "") + (wr ? T.wr(wr) : "");
+    $("#block").textContent = block();
+    $("#results").style.display = "block";
+    count();
+    typeset(quiz);
+  };
+
+  $("#submit").addEventListener("click", () => {
+    const left = P.questions.filter((q) => !answered(q)).length;
+    if (left && !confirm(T.confirm(left))) return;
+    state.submitted = new Date().toISOString();
+    save();
+    showResults();
+    $("#results").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  $("#copy").addEventListener("click", async () => {
+    const text = $("#block").textContent;
+    let done = false;
+    try { await navigator.clipboard.writeText(text); done = true; } catch (e) {}
+    if (!done) {
+      const r = document.createRange(); r.selectNodeContents($("#block"));
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      try { done = document.execCommand("copy"); } catch (e) {}
+    }
+    $("#copied").textContent = done ? T.copied : T.copyFail;
+  });
+
+  // ---- optional libraries (loaded with defer, so they are ready by DOMContentLoaded)
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  function typeset(root) {
+    if (window.renderMathInElement) {
+      renderMathInElement(root, { delimiters: [{ left: "\\[", right: "\\]", display: true }, { left: "\\(", right: "\\)", display: false }], throwOnError: false });
+    }
+  }
+  document.addEventListener("DOMContentLoaded", () => {
+    typeset(document.body);
+    if (window.mermaid) { mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "default" }); mermaid.run({ querySelector: ".mermaid" }); }
+    onScroll();
+  });
+
+  if (state.submitted) showResults();
+  count();
+})();
+</script>
+</body>
+</html>
