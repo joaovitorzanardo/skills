@@ -26,14 +26,16 @@ Write in the Learner's language, at the Profile's level. Keep the technical term
 Use visuals whenever a picture explains faster than prose. That means most Lessons need at least one diagram, and any concept with a parameter to vary should get a widget.
 
 - **Diagrams:** inline `<svg>` inside a `<figure>` with a `<figcaption>`. Use the theme variables (`var(--accent)`, `var(--text)`, `var(--line)`, `var(--muted)`, `var(--accent-2)`) instead of fixed colours so it works in light and dark mode. Use a `viewBox` and no fixed width so it scales on a phone.
-- **Mental models:** a labelled box-and-arrow sketch of how the parts relate. Mermaid is fine for flowcharts (`<pre class="mermaid">`, with `"mermaid"` added to `libraries`).
+- **Mental models:** a labelled box-and-arrow sketch of how the parts relate. Mermaid is fine for flowcharts (`<pre class="mermaid">`): the Artifact viewer renders it natively, so it needs no library.
 - **Interactive widgets:** a `<div class="widget">` with sliders, buttons and a live SVG or canvas, driven by a small `<script>` placed right after it. Good widgets let the Learner *change one thing and see the effect*: move the resistor slider and watch the current, drag the learning rate and watch the loss curve diverge. Pair the widget with a prompt ("set R so the LED gets 20 mA").
   - Keep each script self-contained: wrap it in an IIFE and select elements by id with a prefix unique to the widget.
   - Plain JS and SVG are usually enough. Add `"d3"` or `"chartjs"` to `libraries` only when the plot genuinely needs it.
 - **Math:** write `\( … \)` inline and `\[ … \]` for display, and add `"katex"` to `libraries`.
 - **Code:** `<pre><code>…</code></pre>`, short and runnable.
 
-Available libraries (the build script pins their versions): `katex`, `mermaid`, `d3`, `chartjs`. Inline SVG and JS need no library. `d3` and `chartjs` load before the content, so widget scripts can call `d3` or `new Chart(…)` directly. KaTeX and Mermaid render automatically after the page loads, including inside Practice questions.
+Available libraries (the build script pins their versions): `katex`, `d3`, `chartjs`. Inline SVG and JS need no library. `d3` and `chartjs` load before the content, so widget scripts can call `d3` or `new Chart(…)` directly. KaTeX renders automatically after the page loads, including inside Practice questions and Ask Claude answers. Mermaid blocks are rendered by the Artifact viewer.
+
+The Lesson is published as an Artifact, which runs in a locked-down frame. Widgets can't fetch from the network, embed other sites (no YouTube iframes: link out instead), or use `alert()`, `confirm()` or `prompt()`, which the viewer blocks. Build any confirmation into the widget itself.
 
 ## 3. Sources and citations
 
@@ -78,7 +80,7 @@ A Remedial Lesson (`lesson-NN-remedial-K`) teaches only the concepts the Check f
 
 ### `src/<lesson-id>/content.html`
 
-This is an HTML fragment (no `<html>`, `<head>` or `<body>`). The template supplies the header, title, objectives, table of contents, Practice and references. You write only the teaching. Structure it as `<section>` elements, each starting with an `<h2>`; the table of contents is built from the `<h2>`s. The building blocks are:
+This is an HTML fragment (no `<html>`, `<head>` or `<body>`). The template supplies the header, title, objectives, table of contents, Practice, references and the Ask Claude panel. You write only the teaching. The Ask Claude panel sends the Lesson's visible text to Claude as context, so put anything a Learner might ask about into the text or figure captions, not only inside a picture. Structure it as `<section>` elements, each starting with an `<h2>`; the table of contents is built from the `<h2>`s. The building blocks are:
 
 ```html
 <section>
@@ -147,7 +149,7 @@ Field rules (the build script enforces them):
 
 ## 7. Syllabus
 
-`SYLLABUS.md` at the root of the Course. Update the status column after every Check, and log every change of plan under "Changes".
+`SYLLABUS.md` at the root of the Course. Update the status column after every Check, put each Lesson's Artifact link in its row when you publish it (Remedial Lessons get their own row), and log every change of plan under "Changes".
 
 ```markdown
 # PCB design: Syllabus
@@ -164,11 +166,11 @@ started: 2026-10-23
 
 ## Lessons
 
-| # | Lesson | Concepts | Status |
-|---|---|---|---|
-| 01 | Circuits before boards | ohms-law, series-parallel, units | passed: 2026-10-24, 90% |
-| 02 | Reading a schematic | schematic-symbols, nets | current |
-| 03 | Components and datasheets | … | planned |
+| # | Lesson | Concepts | Status | Link |
+|---|---|---|---|---|
+| 01 | Circuits before boards | ohms-law, series-parallel, units | passed: 2026-10-24, 90% | https://claude.ai/… |
+| 02 | Reading a schematic | schematic-symbols, nets | current | https://claude.ai/… |
+| 03 | Components and datasheets | … | planned | |
 
 ## Optional, later
 

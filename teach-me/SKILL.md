@@ -1,6 +1,6 @@
 ---
 name: teach-me
-description: A personal learning accelerator that teaches me one topic until I actually know it. It works out why I want to learn the topic, runs a diagnostic quiz to find what I already know and which fundamentals I'm missing, writes a syllabus, and delivers interactive HTML lessons with diagrams, simulations, cited sources (textbooks, papers, courses) and a practice section. When I paste my practice results back, it grades them, moves on or reteaches what didn't stick, and keeps a long-term memory of what I've learned in ~/.study-memory/. Use it whenever I say "teach me X", "I want to learn X", "help me understand X properly", "I need to learn X for my project", "continue my lesson on X", "next lesson", or paste a block starting with "TEACH-ME RESULTS", even if I don't say "lesson". Also use it when I ask what I've studied or how I'm doing on a topic. Don't use it for a quick factual question I want answered in one reply, or to map a whole field (that's area-of-knowledge-expert).
+description: A personal learning accelerator that teaches me one topic until I actually know it. It works out why I want to learn the topic, runs a diagnostic quiz to find what I already know and which fundamentals I'm missing, writes a syllabus, and delivers interactive lessons published as Claude artifacts, with diagrams, simulations, cited sources (textbooks, papers, courses), a practice section, and an Ask Claude panel for questions about the material. When I paste my practice results back, it grades them, moves on or reteaches what didn't stick, and keeps a long-term memory of what I've learned in ~/.study-memory/. Use it whenever I say "teach me X", "I want to learn X", "help me understand X properly", "I need to learn X for my project", "continue my lesson on X", "next lesson", or paste a block starting with "TEACH-ME RESULTS", even if I don't say "lesson". Also use it when I ask what I've studied or how I'm doing on a topic. Don't use it for a quick factual question I want answered in one reply, or to map a whole field (that's area-of-knowledge-expert).
 ---
 
 # Teach Me
@@ -26,7 +26,7 @@ There are two stores, and they stay separate on purpose. Memory stays small and 
   <topic-slug>/
   ├── SYLLABUS.md
   ├── PRACTICE_RESULTS.md        (written only by record_results.py)
-  ├── lesson-01.html             (what the Learner opens)
+  ├── lesson-01.html             (published as an Artifact; the Learner opens its link)
   ├── lesson-02-remedial-1.html
   └── src/<lesson-id>/           (your sources for each Lesson)
       ├── content.html
@@ -45,7 +45,7 @@ Retrieve memory first (memory-retrieval.md, steps 1–6). Then decide which kind
 | What the Learner did | Session |
 |---|---|
 | Pasted a block starting with `TEACH-ME RESULTS` | **Check Session**, Part B |
-| "Continue", "next lesson", "I finished lesson N", or a known Topic with a Lesson pending | Ask them to paste their results block if a Practice is unchecked, then run **Part B** |
+| "Continue", "next lesson", "I finished lesson N", or a known Topic with a Lesson pending | Ask them to paste their results block if a Practice is unchecked (give the Lesson's link from `SYLLABUS.md` if they haven't done it yet), then run **Part B** |
 | A Topic that isn't in memory | **New Topic**, Part A |
 | A known Topic that hasn't been studied for a while, or whose Syllabus is complete | Part A with a **Warm-up** instead of the Diagnostic |
 | A whole field ("robotics", "economics") rather than a Topic | Suggest running `area-of-knowledge-expert` first to map the field, then come back to learn one Topic from the map. Teach a Topic from the field right away if they'd rather. |
@@ -83,7 +83,7 @@ Write and build the Lesson. See "Writing a Lesson" below.
 
 ### A5. Close the Session
 
-Update memory (see "End of every Session") and tell the Learner what comes next. They read the Lesson, do the Practice at the end of the page, click **Copy results**, and paste the block here, in this conversation or a new one.
+Update memory (see "End of every Session") and tell the Learner what comes next. They open the Lesson's link, read it, and ask Claude about anything unclear in the page's **Ask Claude** panel (select a passage first to ask about it). Then they do the Practice at the end of the page, click **Copy results**, and paste the block here, in this conversation or a new one.
 
 ## Part B: Check Session
 
@@ -122,11 +122,19 @@ Read `<skill-dir>/references/lesson-writing.md` before writing any Lesson. It co
 1. **Research first.** Use web search to find and check the sources you'll cite: textbooks, seminal papers and university courses for established subjects; recent posts, docs and talks for fast-moving ones. Cite only what you actually found during this Session, never a reference from memory. An invented citation destroys the Learner's trust in everything else.
 2. **Write `src/<lesson-id>/content.html`.** This is the Lesson body as an HTML fragment, with inline SVG diagrams, interactive widgets and ABNT in-text citations linking to `#ref-<id>`. Write it in the Learner's language: the one they write to you in, unless the Profile says otherwise.
 3. **Write `src/<lesson-id>/practice.json`.** This holds the metadata, concepts, Practice questions with answers and explanations, and the references.
-4. **Build and open it:**
+4. **Build it:**
    ```bash
-   python3 <skill-dir>/scripts/build_lesson.py <course-dir> <lesson-id> --open
+   python3 <skill-dir>/scripts/build_lesson.py <course-dir> <lesson-id>
    ```
-   The script validates everything (every core concept practised, citations resolve, answers in range), fills in the frozen template `assets/lesson-template.html`, and opens the page. Fix every ERROR it reports and rebuild. Don't edit the template or the generated HTML by hand.
+   The script validates everything (every core concept practised, citations resolve, answers in range) and fills in the frozen template `assets/lesson-template.html`, writing `<course-dir>/<lesson-id>.html`. Fix every ERROR it reports and rebuild. Don't edit the template or the generated HTML by hand.
+5. **Publish it as an Artifact** with the Artifact tool:
+   - `file_path`: `<course-dir>/<lesson-id>.html`
+   - `capabilities`: `{"sample": {}}`. This powers the page's **Ask Claude** panel: the Learner asks questions about the material and Claude answers with the whole Lesson as context. Before the Practice is submitted it only gives hints on Practice questions; afterwards it explains them.
+   - `icon`: `"book"`, and `description`: the Lesson's title.
+
+   The page is built to the Artifact page contract (fragment, theme tokens, no browser dialogs), so publish it as is: don't load `artifact-design` or restyle it. Write the returned link into the Lesson's row of `SYLLABUS.md` and give it to the Learner. To fix a Lesson already published, rebuild it and publish the same `file_path` again (in a later Session, pass the link from `SYLLABUS.md` as `url`), so the link stays the same.
+
+   If the Course folder is outside the working directory, copy the HTML into the scratchpad and publish that copy. If the Artifact tool isn't available, run the build with `--open` instead: it writes a standalone page and opens it in the browser, and the Ask Claude panel stays hidden there.
 
 Lesson ids are `lesson-NN` for regular Lessons and `lesson-NN-remedial-K` for the K-th Remedial Lesson of Lesson NN.
 

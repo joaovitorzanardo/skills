@@ -1,6 +1,6 @@
 # Practice runs in the Lesson page and returns by paste-back
 
-Practice lives inside each Lesson's static HTML page. The page grades multiple choice, leaves written answers ungraded, and produces a fixed, versioned results block that the Learner pastes into the chat. Pasting that block starts a Check Session. We chose this so Practice can sit next to the interactive material it exercises. The cost is a manual copy step, and a static page can't write files to disk.
+Practice lives inside each Lesson's page (published as an Artifact since ADR 0002). The page grades multiple choice, leaves written answers ungraded, and produces a fixed, versioned results block that the Learner pastes into the chat. Pasting that block starts a Check Session. We chose this so Practice can sit next to the interactive material it exercises. The cost is a manual copy step, and a static page can't write files to disk.
 
 ## Considered Options
 

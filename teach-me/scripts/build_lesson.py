@@ -4,7 +4,12 @@
 Reads  <course>/src/<lesson-id>/practice.json and content.html,
 checks them, fills assets/lesson-template.html, and writes <course>/<lesson-id>.html.
 
-  python3 build_lesson.py <course-dir> <lesson-id> [--open] [--check]
+The page is an Artifact fragment (no <html>/<head>/<body>): publish it with the Artifact tool
+and capabilities {"sample": {}} so the Learner can ask Claude about it from inside the page.
+--standalone wraps it in a full document instead, for opening in a plain browser when the
+Artifact tool isn't available (the Ask Claude panel then stays hidden). --open implies it.
+
+  python3 build_lesson.py <course-dir> <lesson-id> [--standalone] [--open] [--check]
 
 Exit code 0 = built (warnings may be printed), 1 = errors (nothing written).
 """
@@ -23,19 +28,27 @@ from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE = SKILL_DIR / "assets" / "lesson-template.html"
+# Page title words, matching the UI languages in the template.
+TITLE_WORDS = {"en": ("Lesson", "review"), "pt": ("Lição", "revisão")}
+
+# The same skeleton the Artifact tool adds at publish time, for --standalone pages.
+STANDALONE = ('<!doctype html><html><head><meta charset="utf-8">'
+              '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
+              '</head><body>\n{page}\n</body></html>\n')
 
 LESSON_ID = re.compile(r"^lesson-(\d{2})(?:-remedial-(\d+))?$")
 KEBAB = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 # Pinned versions. d3 and chartjs load synchronously because widget scripts in the
-# content run while the page parses; katex and mermaid only run after DOMContentLoaded.
+# content run while the page parses; katex only runs after the page loads.
+# Mermaid loads nothing: the Artifact viewer renders <pre class="mermaid"> blocks natively.
 LIBRARIES = {
     "katex": [
         '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">',
         '<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>',
         '<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>',
     ],
-    "mermaid": ['<script defer src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>'],
+    "mermaid": [],
     "d3": ['<script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>'],
     "chartjs": ['<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>'],
 }
@@ -96,8 +109,6 @@ def validate(course_dir, lesson_id, data, content, rep):
         libs = []
     if ("\\(" in content or "\\[" in content) and "katex" not in libs:
         rep.warn("content uses \\( or \\[ math but 'katex' is not in libraries")
-    if re.search(r'class="[^"]*\bmermaid\b', content) and "mermaid" not in libs:
-        rep.warn("content has a .mermaid block but 'mermaid' is not in libraries")
     if re.search(r"\bd3\.", content) and "d3" not in libs:
         rep.warn("content uses d3 but 'd3' is not in libraries")
     if re.search(r"\bnew Chart\(", content) and "chartjs" not in libs:
@@ -228,9 +239,10 @@ def build(course_dir, lesson_id, data, content):
     practice = {"course": data["course"], "lesson": lesson_id, "questions": data["questions"]}
     encoded = base64.b64encode(json.dumps(practice, ensure_ascii=False).encode("utf-8")).decode("ascii")
     libs = "\n".join(tag for name in data.get("libraries", []) for tag in LIBRARIES[name])
+    lesson_w, review_w = TITLE_WORDS.get(data["language"][:2].lower(), TITLE_WORDS["en"])
+    number = f"{lesson_w} {m.group(1)}" + (f" {review_w} {m.group(2)}" if m.group(2) else "")
     values = {
-        "LANG": html.escape(data["language"]),
-        "TITLE": html.escape(f"{data['title']} · {data['topic']}"),
+        "TITLE": html.escape(f"{data['topic']} · {number}"),
         "LIBS": libs,
         "META": json.dumps(meta, ensure_ascii=False).replace("</", "<\\/"),
         "PRACTICE": encoded,
@@ -245,7 +257,7 @@ def build(course_dir, lesson_id, data, content):
         return values[key]
 
     # One pass, so text inserted for one marker is never scanned for another.
-    out = re.sub(r"<!--__TM_(LIBS|CONTENT)__-->|__TM_(LANG|TITLE|META|PRACTICE)__", sub, template)
+    out = re.sub(r"<!--__TM_(LIBS|CONTENT)__-->|__TM_(TITLE|META|PRACTICE)__", sub, template)
     missing = set(values) - set(seen)
     if missing:
         raise RuntimeError(f"template is missing markers: {sorted(missing)}")
@@ -275,7 +287,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("course_dir", type=Path)
     ap.add_argument("lesson_id")
-    ap.add_argument("--open", action="store_true", help="open the page in the default browser")
+    ap.add_argument("--standalone", action="store_true", help="write a full HTML document for a plain browser, not an Artifact")
+    ap.add_argument("--open", action="store_true", help="write a standalone page and open it in the default browser")
     ap.add_argument("--check", action="store_true", help="validate only; write nothing")
     args = ap.parse_args()
 
@@ -314,9 +327,13 @@ def main():
         print(f"CHECK OK: {summary}")
         return 0
     out = course_dir / f"{args.lesson_id}.html"
-    out.write_text(build(course_dir, args.lesson_id, data, content), encoding="utf-8")
-    print(f"WROTE: {out}")
+    page = build(course_dir, args.lesson_id, data, content)
+    standalone = args.standalone or args.open
+    out.write_text(STANDALONE.format(page=page) if standalone else page, encoding="utf-8")
+    print(f"WROTE: {out}" + (" (standalone)" if standalone else ""))
     print(summary)
+    if not standalone:
+        print(f"NEXT: publish {out} with the Artifact tool, capabilities {{\"sample\": {{}}}}")
     if args.open:
         print("OPENED in the browser" if open_in_browser(out) else f"Could not open a browser; open {out} yourself")
     return 0

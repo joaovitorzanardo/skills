@@ -1,9 +1,5 @@
-<!doctype html>
-<html lang="__TM_LANG__">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>__TM_TITLE__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -11,32 +7,43 @@
 <style>
 /*
   teach-me lesson template. FROZEN: build_lesson.py only replaces the __TM_*__ markers.
+  It is an Artifact page fragment: the Artifact tool wraps it in <html>/<head>/<body> at publish time.
   Lesson widgets should colour themselves with the variables below so they work in light and dark mode.
 */
 :root{
   --bg:#FBFAF7;--surface:#FFFFFF;--surface-2:#F3F1EC;--text:#1F2328;--text-soft:#3D4248;--muted:#6B6F76;--line:#E4E1DA;
-  --accent:#2F6FEB;--accent-2:#D9622B;--good:#1F883D;--bad:#CF222E;
+  --accent:#2F6FEB;--accent-2:#D9622B;--good:#1F883D;--bad:#CF222E;--on-accent:#FFFFFF;
   --good-bg:rgba(31,136,61,.09);--bad-bg:rgba(207,34,46,.08);--accent-bg:rgba(47,111,235,.08);--accent-2-bg:rgba(217,98,43,.09);
+  --shadow:0 12px 40px rgba(31,35,40,.16);
   --ui:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--read:"Source Serif 4",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
   color-scheme:light;
 }
-@media (prefers-color-scheme:dark){:root{
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0F1115;--surface:#171A20;--surface-2:#1E222A;--text:#E8E6E3;--text-soft:#C9CCD1;--muted:#9AA0A6;--line:#2A2E35;
-  --accent:#6EA8FE;--accent-2:#FF8A4C;--good:#3FB950;--bad:#F85149;
+  --accent:#6EA8FE;--accent-2:#FF8A4C;--good:#3FB950;--bad:#F85149;--on-accent:#0F1115;
   --good-bg:rgba(63,185,80,.12);--bad-bg:rgba(248,81,73,.12);--accent-bg:rgba(110,168,254,.10);--accent-2-bg:rgba(255,138,76,.11);
+  --shadow:0 12px 40px rgba(0,0,0,.5);
   color-scheme:dark;
 }}
+:root[data-theme="dark"]{
+  --bg:#0F1115;--surface:#171A20;--surface-2:#1E222A;--text:#E8E6E3;--text-soft:#C9CCD1;--muted:#9AA0A6;--line:#2A2E35;
+  --accent:#6EA8FE;--accent-2:#FF8A4C;--good:#3FB950;--bad:#F85149;--on-accent:#0F1115;
+  --good-bg:rgba(63,185,80,.12);--bad-bg:rgba(248,81,73,.12);--accent-bg:rgba(110,168,254,.10);--accent-2-bg:rgba(255,138,76,.11);
+  --shadow:0 12px 40px rgba(0,0,0,.5);
+  color-scheme:dark;
+}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth;scroll-padding-top:24px}
 body{margin:0;background:var(--bg);color:var(--text);font:400 18px/1.7 var(--read);-webkit-font-smoothing:antialiased}
 a{color:var(--accent)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
 #progress{position:fixed;inset:0 0 auto 0;height:3px;background:var(--accent);transform-origin:0 50%;transform:scaleX(0);z-index:20}
 
-.layout{display:grid;grid-template-columns:minmax(0,1fr);max-width:1180px;margin:0 auto;padding:0 16px}
-@media (min-width:1100px){.layout{grid-template-columns:230px minmax(0,740px);gap:64px;padding:0 40px}}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (min-width:1100px){.layout{grid-template-columns:230px minmax(0,740px);gap:64px;padding-left:max(40px,env(safe-area-inset-left,0px));padding-right:max(40px,env(safe-area-inset-right,0px))}}
 nav.toc{display:none}
-@media (min-width:1100px){nav.toc{display:block;position:sticky;top:48px;align-self:start;margin-top:120px;font:500 13px/1.4 var(--ui)}}
+@media (min-width:1100px){nav.toc{display:block;position:sticky;top:calc(48px + env(safe-area-inset-top,0px));align-self:start;margin-top:120px;font:500 13px/1.4 var(--ui)}}
 .toc p{margin:0 0 12px;font:600 11px var(--ui);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .toc a{display:block;padding:7px 0 7px 14px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--text)}
@@ -45,14 +52,14 @@ main{min-width:0;padding-bottom:120px}
 
 header.lesson-head{padding:72px 0 32px;border-bottom:1px solid var(--line);margin-bottom:40px}
 .kicker{font:600 12px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--accent-2);margin:0 0 14px}
-h1{font:700 clamp(30px,5vw,42px)/1.15 var(--ui);letter-spacing:-.02em;margin:0 0 16px}
+h1{font:700 clamp(30px,5vw,42px)/1.15 var(--ui);letter-spacing:-.02em;margin:0 0 16px;text-wrap:balance}
 .meta{font:500 14px var(--ui);color:var(--muted);display:flex;gap:18px;flex-wrap:wrap}
 .objectives{margin:28px 0 0;padding:20px 24px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
 .objectives p{margin:0 0 8px;font:600 13px var(--ui);color:var(--muted)}
 .objectives ul{margin:0;padding-left:20px;font-size:17px}
 
 #content section{margin:0 0 56px}
-#content h2{font:700 26px/1.25 var(--ui);letter-spacing:-.01em;margin:0 0 18px}
+#content h2{font:700 26px/1.25 var(--ui);letter-spacing:-.01em;margin:0 0 18px;text-wrap:balance}
 #content h3{font:600 20px/1.3 var(--ui);margin:32px 0 10px}
 #content p,#content li{color:var(--text-soft)}
 #content b,#content strong{color:var(--text)}
@@ -63,7 +70,7 @@ pre code{background:none;padding:0}
 a.cite{font:500 .8em var(--ui);text-decoration:none;color:var(--accent);white-space:nowrap}
 a.cite:hover{text-decoration:underline}
 img,svg,canvas,video{max-width:100%}
-figure{margin:32px 0;padding:20px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+figure{margin:32px 0;padding:20px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
 figure svg{display:block;width:100%;height:auto}
 figcaption{margin-top:12px;font:400 14px/1.5 var(--ui);color:var(--muted)}
 .callout{margin:24px 0;padding:16px 20px;border-left:4px solid var(--accent);background:var(--accent-bg);border-radius:0 10px 10px 0}
@@ -74,13 +81,14 @@ figcaption{margin-top:12px;font:400 14px/1.5 var(--ui);color:var(--muted)}
 details.think{margin:24px 0;border:1px dashed var(--accent);border-radius:10px;padding:12px 18px;background:var(--surface)}
 details.think summary{cursor:pointer;font:600 15px var(--ui);color:var(--accent)}
 details.think[open] summary{margin-bottom:8px}
-.widget{margin:32px 0;padding:20px;background:var(--surface);border:1px solid var(--line);border-radius:12px;font:400 15px/1.5 var(--ui)}
+.widget{margin:32px 0;padding:20px;background:var(--surface);border:1px solid var(--line);border-radius:12px;font:400 15px/1.5 var(--ui);overflow-x:auto}
 .widget label{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0}
 .widget input[type=range]{flex:1;min-width:160px;accent-color:var(--accent)}
 .widget button,.btn{font:600 14px var(--ui);padding:9px 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);cursor:pointer}
 .widget button:hover,.btn:hover{border-color:var(--accent)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .btn:disabled{opacity:.5;cursor:default}
+.table-wrap,#content table{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font:400 15px/1.5 var(--ui);margin:24px 0}
 th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
 .katex-display{overflow-x:auto;overflow-y:hidden;padding:4px 0}
@@ -104,7 +112,7 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
 .fb b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 .actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:28px 0}
 .note{font:400 14px var(--ui);color:var(--muted)}
-#results{display:none;margin-top:28px;padding:22px;border:2px solid var(--accent);border-radius:12px;background:var(--surface);font-family:var(--ui)}
+#results{margin-top:28px;padding:22px;border:2px solid var(--accent);border-radius:12px;background:var(--surface);font-family:var(--ui)}
 #results h3{margin:0 0 6px;font:700 20px var(--ui)}
 #results pre{white-space:pre-wrap;word-break:break-all;font-size:13px;max-height:180px}
 .score{font:700 15px var(--ui);margin:0 0 12px}
@@ -115,10 +123,42 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
 #references li{margin:0 0 12px;scroll-margin-top:24px}
 #references li:target{background:var(--accent-bg);border-radius:6px}
 #references a.open{font-weight:600;text-decoration:none;white-space:nowrap}
-@media print{nav.toc,#progress,.actions{display:none}}
+
+/* ask claude */
+#ask-fab{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:30;display:flex;align-items:center;gap:8px;font:600 15px var(--ui);padding:12px 18px;border-radius:999px;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);box-shadow:var(--shadow);cursor:pointer}
+#ask-fab svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+#ask{position:fixed;top:0;right:0;bottom:0;z-index:40;width:min(440px,100%);display:flex;flex-direction:column;background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow);font:400 15px/1.55 var(--ui);
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.ask-head{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.ask-head h2{flex:1;margin:0;font:700 16px var(--ui)}
+.ask-head button{font:500 13px var(--ui);padding:6px 10px;border-radius:6px;border:1px solid transparent;background:none;color:var(--muted);cursor:pointer}
+.ask-head button:hover{border-color:var(--line);color:var(--text)}
+#ask-log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;min-height:0}
+.ask-empty{color:var(--muted)}
+.ask-empty p{margin:0 0 12px}
+.ask-sugg{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.ask-sugg button{font:500 14px var(--ui);text-align:left;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);cursor:pointer}
+.ask-sugg button:hover{border-color:var(--accent)}
+.msg{max-width:100%;min-width:0;overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;max-width:88%;padding:10px 14px;border-radius:14px 14px 4px 14px;background:var(--accent-bg);color:var(--text);white-space:pre-wrap}
+.msg.me blockquote{margin:0 0 6px;padding-left:10px;border-left:3px solid var(--accent);color:var(--muted);font-size:13px;white-space:normal}
+.msg.ai{color:var(--text-soft)}
+.msg.ai p{margin:0 0 10px}
+.msg.ai ul,.msg.ai ol{margin:0 0 10px;padding-left:22px}
+.msg.ai pre{font-size:13px;margin:0 0 10px}
+.msg.ai b{color:var(--text)}
+.msg.wait{color:var(--muted);font-style:italic}
+.msg.err{color:var(--bad);font-size:14px}
+.ask-foot{border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+#ask-quote{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-left:3px solid var(--accent);background:var(--accent-bg);border-radius:0 8px 8px 0;font-size:13px;color:var(--text-soft)}
+#ask-quote span{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#ask-quote button{border:none;background:none;color:var(--muted);cursor:pointer;font:600 14px var(--ui);padding:0 2px}
+#ask-input{min-height:64px;max-height:180px;font-size:15px}
+.ask-row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+@media (max-width:600px){#ask{top:auto;height:85%;width:100%;border-left:none;border-top:1px solid var(--line);border-radius:16px 16px 0 0;padding-left:env(safe-area-inset-left,0px)}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
-</head>
-<body>
+
 <div id="progress"></div>
 <div class="layout">
   <nav class="toc" aria-label="Contents"><p id="toc-h"></p><div id="toc"></div></nav>
@@ -142,7 +182,7 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
         <button class="btn primary" id="submit" type="button"></button>
         <span class="note" id="answered"></span>
       </div>
-      <div id="results" role="region" aria-live="polite">
+      <div id="results" role="region" aria-live="polite" hidden>
         <h3 id="res-h"></h3>
         <p class="score" id="score"></p>
         <p class="note" id="res-how"></p>
@@ -158,6 +198,24 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
   </main>
 </div>
 
+<button id="ask-fab" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg><span id="ask-fab-l"></span></button>
+<aside id="ask" aria-labelledby="ask-h" hidden>
+  <div class="ask-head">
+    <h2 id="ask-h"></h2>
+    <button id="ask-clear" type="button"></button>
+    <button id="ask-close" type="button" aria-label="Close">✕</button>
+  </div>
+  <div id="ask-log" aria-live="polite"></div>
+  <div class="ask-foot">
+    <div id="ask-quote" hidden><span id="ask-quote-t"></span><button id="ask-quote-x" type="button" aria-label="Remove">✕</button></div>
+    <textarea id="ask-input" rows="2"></textarea>
+    <div class="ask-row">
+      <span class="note" id="ask-note"></span>
+      <button class="btn primary" id="ask-send" type="button"></button>
+    </div>
+  </div>
+</aside>
+
 <script type="application/json" id="tm-meta">__TM_META__</script>
 <script type="text/plain" id="tm-practice">__TM_PRACTICE__</script>
 <script>
@@ -169,26 +227,39 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
   const meta = JSON.parse($("#tm-meta").textContent);
   const bytes = Uint8Array.from(atob($("#tm-practice").textContent.trim()), (c) => c.charCodeAt(0));
   const P = JSON.parse(new TextDecoder().decode(bytes));
+  document.documentElement.lang = meta.language || "en";
 
   const UI = {
     en: { toc: "Contents", obj: "By the end of this lesson you will be able to", min: "min reading", qs: "questions",
           lesson: "Lesson", remedial: "Review", practice: "Practice",
           psub: "Answer on your own first, without scrolling back. Then submit, copy the results and paste them into Claude.",
           q: "Question", written: "Written answer", submit: "Submit answers", left: (n) => `${n} unanswered`,
-          all: "All answered", confirm: (n) => `${n} question(s) are unanswered. Submit anyway?`,
+          all: "All answered", confirm: (n) => `Submit with ${n} unanswered`, confirmNote: "Click again to submit anyway.",
           resH: "Your results", mc: (a, b) => `Multiple choice: ${a} / ${b} correct`, wr: (n) => ` · ${n} written answer(s) to be graded by Claude`,
           how: "Click the button, then paste the block into your conversation with Claude. It will grade your answers and prepare what comes next.",
           copy: "Copy results", copied: "Copied. Now paste it into Claude.", copyFail: "Select the text above and copy it manually.",
-          why: "Explanation", model: "Model answer", refs: "References", open: "Open ↗", placeholder: "Write your answer in your own words…" },
+          why: "Explanation", model: "Model answer", refs: "References", open: "Open ↗", placeholder: "Write your answer in your own words…",
+          ask: "Ask Claude", askH: "Ask about this lesson", clear: "Clear", send: "Send", stop: "Stop", thinking: "Thinking…",
+          askPh: "Ask anything about the lesson…", askHint: "Select a passage first to ask about it.", askIntro: "Stuck on something? Ask here. Claude has the whole lesson in front of it.",
+          sugg: ["Explain the main idea in simpler words", "Give me another worked example", "What's the most common mistake here?"],
+          suggSel: "Explain the selected passage", about: "About this passage:",
+          errs: { not_granted: "Claude isn't allowed on this page. You can allow it from the artifact's Permissions menu.", rate_limited: "Too many questions at once. Wait a minute and try again.",
+                  session_expired: "Sign in to Claude again, then retry.", refused: "Claude couldn't answer that. Try rephrasing the question.", generic: "Something went wrong. Try again." } },
     pt: { toc: "Conteúdo", obj: "Ao final desta lição você será capaz de", min: "min de leitura", qs: "questões",
           lesson: "Lição", remedial: "Revisão", practice: "Prática",
           psub: "Responda sozinho primeiro, sem voltar no texto. Depois envie, copie os resultados e cole no Claude.",
           q: "Questão", written: "Resposta escrita", submit: "Enviar respostas", left: (n) => `${n} sem resposta`,
-          all: "Todas respondidas", confirm: (n) => `${n} questão(ões) sem resposta. Enviar mesmo assim?`,
+          all: "Todas respondidas", confirm: (n) => `Enviar com ${n} sem resposta`, confirmNote: "Clique de novo para enviar mesmo assim.",
           resH: "Seus resultados", mc: (a, b) => `Múltipla escolha: ${a} / ${b} corretas`, wr: (n) => ` · ${n} resposta(s) escrita(s) para o Claude corrigir`,
           how: "Clique no botão e cole o bloco na conversa com o Claude. Ele corrige suas respostas e prepara o próximo passo.",
           copy: "Copiar resultados", copied: "Copiado. Agora cole no Claude.", copyFail: "Selecione o texto acima e copie manualmente.",
-          why: "Explicação", model: "Resposta modelo", refs: "Referências", open: "Abrir ↗", placeholder: "Escreva sua resposta com suas palavras…" },
+          why: "Explicação", model: "Resposta modelo", refs: "Referências", open: "Abrir ↗", placeholder: "Escreva sua resposta com suas palavras…",
+          ask: "Perguntar ao Claude", askH: "Pergunte sobre esta lição", clear: "Limpar", send: "Enviar", stop: "Parar", thinking: "Pensando…",
+          askPh: "Pergunte qualquer coisa sobre a lição…", askHint: "Selecione um trecho antes para perguntar sobre ele.", askIntro: "Travou em algo? Pergunte aqui. O Claude tem a lição inteira na frente dele.",
+          sugg: ["Explique a ideia principal com palavras mais simples", "Me dê outro exemplo resolvido", "Qual é o erro mais comum aqui?"],
+          suggSel: "Explique o trecho selecionado", about: "Sobre este trecho:",
+          errs: { not_granted: "O Claude não está liberado nesta página. Libere pelo menu de Permissões do artifact.", rate_limited: "Muitas perguntas de uma vez. Espere um minuto e tente de novo.",
+                  session_expired: "Entre no Claude de novo e tente outra vez.", refused: "O Claude não conseguiu responder. Tente reformular a pergunta.", generic: "Algo deu errado. Tente de novo." } },
   };
   const T = UI[(meta.language || "en").slice(0, 2).toLowerCase()] || UI.en;
 
@@ -247,7 +318,7 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
       q.options.forEach((o, j) => {
         const lab = el("label", "opt");
         const inp = el("input");
-        inp.type = "radio"; inp.name = q.id; inp.value = j;
+        inp.type = "radio"; inp.name = q.id; inp.value = j; inp.id = `${q.id}-o${j}`;
         if (state.answers[q.id] === j) inp.checked = true;
         inp.addEventListener("change", () => { state.answers[q.id] = j; save(); count(); });
         lab.append(inp, el("span", null, o));
@@ -255,16 +326,18 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
       });
     } else {
       const ta = el("textarea");
-      ta.name = q.id; ta.placeholder = T.placeholder; ta.value = state.answers[q.id] || "";
+      ta.name = q.id; ta.id = `${q.id}-w`; ta.placeholder = T.placeholder; ta.value = state.answers[q.id] || "";
       ta.addEventListener("input", () => { state.answers[q.id] = ta.value; save(); count(); });
       box.append(ta);
     }
     quiz.append(box);
   });
 
+  let armed = false;  // the viewer blocks confirm(), so a first click with gaps arms the button instead
   const answered = (q) => { const a = state.answers[q.id]; return q.type === "mc" ? Number.isInteger(a) : !!(a && a.trim()); };
   const count = () => {
     const left = P.questions.filter((q) => !answered(q)).length;
+    if (armed) { armed = false; $("#submit").textContent = T.submit; }
     $("#answered").textContent = state.submitted ? "" : left ? T.left(left) : T.all;
   };
 
@@ -295,14 +368,20 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
     });
     $("#score").textContent = (mc ? T.mc(ok, mc) : "") + (wr ? T.wr(wr) : "");
     $("#block").textContent = block();
-    $("#results").style.display = "block";
+    $("#results").hidden = false;
     count();
     typeset(quiz);
   };
 
   $("#submit").addEventListener("click", () => {
     const left = P.questions.filter((q) => !answered(q)).length;
-    if (left && !confirm(T.confirm(left))) return;
+    if (left && !armed) {
+      armed = true;
+      $("#submit").textContent = T.confirm(left);
+      $("#answered").textContent = T.confirmNote;
+      return;
+    }
+    armed = false;
     state.submitted = new Date().toISOString();
     save();
     showResults();
@@ -321,22 +400,164 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
     $("#copied").textContent = done ? T.copied : T.copyFail;
   });
 
-  // ---- optional libraries (loaded with defer, so they are ready by DOMContentLoaded)
-  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  // ---- ask claude (the `sample` capability; hidden wherever the page isn't served by a Claude viewer)
+  const ASK_KEY = `${KEY}:ask`;
+  const plain = (h) => { const d = document.createElement("div"); d.innerHTML = h; return d.textContent; };
+  const lessonText = () => {
+    const content = $("#content").innerText.replace(/\n{3,}/g, "\n\n").slice(0, 80000);
+    const refs = meta.references.map((r) => `- [${r.id}] ${plain(r.citation_html)}${r.url ? " " + r.url : ""}`).join("\n");
+    const qs = P.questions.map((q, i) => {
+      let s = `Q${i + 1} (${q.type === "mc" ? "multiple choice" : "written"}): ${plain(q.prompt)}`;
+      if (q.type === "mc") s += "\n" + q.options.map((o, j) => `  ${String.fromCharCode(65 + j)}) ${plain(o)}`).join("\n");
+      if (state.submitted) {
+        const a = state.answers[q.id];
+        if (q.type === "mc") s += `\n  Learner chose: ${Number.isInteger(a) ? String.fromCharCode(65 + a) : "nothing"}; correct: ${String.fromCharCode(65 + q.answer)}. Explanation: ${plain(q.explanation)}`;
+        else s += `\n  Learner wrote: ${a && a.trim() ? a.trim() : "nothing"}\n  Model answer: ${plain(q.model_answer)}`;
+      }
+      return s;
+    }).join("\n\n");
+    return `# ${meta.topic}: ${meta.title}\n\nObjectives:\n${meta.objectives.map((o) => "- " + o).join("\n")}\n\n## Lesson text\n${content}\n\n## Practice (${state.submitted ? "already submitted" : "NOT submitted yet"})\n${qs}\n\n## References\n${refs}`;
+  };
+  const rules = () => [
+    "You are the tutor inside a lesson page the Learner is reading. They ask you questions about the material below.",
+    `Reply in the lesson's language (${meta.language}). Be clear and brief: a few short paragraphs at most, unless they ask for more.`,
+    "Build on the lesson's own terms, examples and figures. If the question goes beyond this lesson, answer briefly and say so.",
+    "Use Markdown (**bold**, lists, `code`, fenced code blocks) and \\( … \\) or \\[ … \\] for math.",
+    state.submitted
+      ? "The Practice is submitted: you may explain any question, why their answer was right or wrong, and the correct answer."
+      : "The Practice is NOT submitted yet: never reveal, confirm or rule out the answer to a Practice question. Give a hint that points to the part of the lesson that answers it.",
+    "When you point to sources, use only the lesson's references. Never invent a citation.",
+    "",
+    lessonText(),
+  ].join("\n");
+
+  let turns = [];
+  try { turns = JSON.parse(localStorage.getItem(ASK_KEY) || "[]").filter((t) => t && t.content); } catch (e) {}
+  const saveTurns = () => { try { localStorage.setItem(ASK_KEY, JSON.stringify(turns.slice(-30))); } catch (e) {} };
+
+  const inline = (t) => t.split(/(`[^`\n]+`)/).map((s) => /^`[^`]+`$/.test(s) ? `<code>${esc(s.slice(1, -1))}</code>`
+    : esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/(^|[\s(])\*([^*\s][^*]*?)\*(?=[\s).,;:!?]|$)/g, "$1<em>$2</em>")).join("");
+  const md = (src) => {
+    const out = [], L = src.replace(/\r/g, "").split("\n");
+    const isUl = (l) => /^\s*[-*•] /.test(l), isOl = (l) => /^\s*\d+[.)] /.test(l), isFence = (l) => /^\s*```/.test(l), isH = (l) => /^#{1,6} /.test(l);
+    for (let i = 0; i < L.length;) {
+      const l = L[i];
+      if (isFence(l)) { const b = []; i++; while (i < L.length && !isFence(L[i])) b.push(L[i++]); i++; out.push(`<pre><code>${esc(b.join("\n"))}</code></pre>`); }
+      else if (isUl(l) || isOl(l)) {
+        const tag = isUl(l) ? "ul" : "ol", test = tag === "ul" ? isUl : isOl, items = [];
+        while (i < L.length && test(L[i])) items.push(L[i++].replace(/^\s*([-*•]|\d+[.)]) /, ""));
+        out.push(`<${tag}>${items.map((t) => `<li>${inline(t)}</li>`).join("")}</${tag}>`);
+      }
+      else if (isH(l)) { out.push(`<p><b>${inline(l.replace(/^#+ /, ""))}</b></p>`); i++; }
+      else if (!l.trim()) i++;
+      else { const b = []; while (i < L.length && L[i].trim() && !isFence(L[i]) && !isUl(L[i]) && !isOl(L[i]) && !isH(L[i])) b.push(L[i++]); out.push(`<p>${b.map(inline).join("<br>")}</p>`); }
+    }
+    return out.join("");
+  };
+
+  const log = $("#ask-log"), input = $("#ask-input"), send = $("#ask-send");
+  let quote = "", ctl = null, sample = null;
+  const atEnd = () => { log.scrollTop = log.scrollHeight; };
+  const meBubble = (t) => { const b = el("div", "msg me"); if (t.quote) { const q = el("blockquote"); q.textContent = t.quote; b.append(q); } b.append(document.createTextNode(t.ask || t.content)); return b; };
+  const aiBubble = (text) => { const b = el("div", "msg ai", md(text)); return b; };
+  const setQuote = (q) => { quote = q; $("#ask-quote").hidden = !q; $("#ask-quote-t").textContent = q; renderEmpty(); };
+  const renderEmpty = () => {
+    if (turns.length) return;
+    log.innerHTML = "";
+    const box = el("div", "ask-empty");
+    box.append(el("p", null, esc(T.askIntro)));
+    const s = el("div", "ask-sugg");
+    (quote ? [T.suggSel, ...T.sugg] : T.sugg).forEach((txt) => { const b = el("button"); b.type = "button"; b.textContent = txt; b.onclick = () => ask(txt); s.append(b); });
+    box.append(s);
+    log.append(box);
+  };
+  const renderLog = () => {
+    log.innerHTML = "";
+    if (!turns.length) return renderEmpty();
+    turns.forEach((t) => log.append(t.role === "user" ? meBubble(t) : aiBubble(t.content)));
+    typeset(log); atEnd();
+  };
+
+  async function ask(text) {
+    text = (text || "").trim();
+    if (!text || ctl || !sample) return;
+    if (!turns.length) log.innerHTML = "";
+    const turn = { role: "user", ask: text, quote, content: quote ? `${T.about}\n"""\n${quote}\n"""\n\n${text}` : text };
+    turns.push(turn);
+    log.append(meBubble(turn));
+    input.value = ""; setQuote("");
+    const out = el("div", "msg ai wait", esc(T.thinking));
+    log.append(out); atEnd();
+    ctl = new AbortController();
+    send.textContent = T.stop; $("#ask-note").textContent = "";
+    const history = turns.slice(-20).map((t) => ({ role: t.role, content: t.content }));
+    while (history.length && history[0].role !== "user") history.shift();
+    try {
+      const { text: answer } = await sample([{ role: "user", content: rules() }, ...history], {
+        cache: false, signal: ctl.signal,
+        onText: ({ text: t }) => { out.className = "msg ai"; out.innerHTML = md(t); atEnd(); },
+      });
+      out.className = "msg ai"; out.innerHTML = md(answer);
+      turns.push({ role: "assistant", content: answer });
+      saveTurns();
+      typeset(out);
+    } catch (e) {
+      const kept = e && e.code !== "refused" ? e.text : "";
+      if (kept) { out.className = "msg ai"; out.innerHTML = md(kept); turns.push({ role: "assistant", content: kept }); }
+      else out.remove();
+      if (!e || e.code !== "cancelled") log.append(el("div", "msg err", esc(T.errs[e && e.code] || T.errs.generic)));
+      if (e && ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(e.code)) { input.disabled = true; send.disabled = true; }
+      saveTurns(); atEnd();
+    } finally {
+      ctl = null; send.textContent = T.send;
+    }
+  }
+
+  $("#ask-fab-l").textContent = T.ask;
+  $("#ask-h").textContent = T.askH;
+  $("#ask-clear").textContent = T.clear;
+  send.textContent = T.send;
+  input.placeholder = T.askPh;
+  const selected = () => {
+    const s = getSelection();
+    if (!s || s.isCollapsed || !s.rangeCount || !$("#content").contains(s.getRangeAt(0).commonAncestorContainer)) return "";
+    return s.toString().trim().slice(0, 1500);
+  };
+  // Read the selection on pointerdown: the click that follows can collapse it.
+  $("#ask-fab").addEventListener("pointerdown", () => { const q = selected(); if (q) setQuote(q); });
+  $("#ask-fab").addEventListener("click", () => {
+    $("#ask").hidden = false; $("#ask-fab").hidden = true;
+    if (!quote) { const q = selected(); if (q) setQuote(q); }
+    $("#ask-note").textContent = quote ? "" : T.askHint;
+    input.focus();
+  });
+  $("#ask-close").addEventListener("click", () => { $("#ask").hidden = true; $("#ask-fab").hidden = false; });
+  $("#ask-clear").addEventListener("click", () => { if (ctl) ctl.abort(); turns = []; saveTurns(); renderLog(); });
+  $("#ask-quote-x").addEventListener("click", () => setQuote(""));
+  send.addEventListener("click", () => (ctl ? ctl.abort() : ask(input.value)));
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); if (!ctl) ask(input.value); } });
+  addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#ask").hidden) $("#ask-close").click(); });
+
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("sample").then((s) => {
+      if (typeof s !== "function") return;
+      sample = s;
+      renderLog();
+      $("#ask-fab").hidden = false;
+    }).catch(() => {});
+  }
+
+  // ---- optional libraries (loaded with defer, so they are ready by DOMContentLoaded).
+  // Mermaid needs no library: the Artifact viewer renders <pre class="mermaid"> blocks itself.
   function typeset(root) {
     if (window.renderMathInElement) {
       renderMathInElement(root, { delimiters: [{ left: "\\[", right: "\\]", display: true }, { left: "\\(", right: "\\)", display: false }], throwOnError: false });
     }
   }
-  document.addEventListener("DOMContentLoaded", () => {
-    typeset(document.body);
-    if (window.mermaid) { mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "default" }); mermaid.run({ querySelector: ".mermaid" }); }
-    onScroll();
-  });
+  const ready = () => { typeset(document.body); onScroll(); };
+  if (document.readyState === "complete") ready(); else addEventListener("load", ready);
 
   if (state.submitted) showResults();
   count();
 })();
 </script>
-</body>
-</html>
