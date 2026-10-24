@@ -36,6 +36,7 @@ STANDALONE = ('<!doctype html><html><head><meta charset="utf-8">'
               '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
               '</head><body>\n{page}\n</body></html>\n')
 
+HANDS_ON_LEVELS = ("guided", "scaffolded", "independent")
 LESSON_ID = re.compile(r"^lesson-(\d{2})(?:-remedial-(\d+))?$")
 KEBAB = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
@@ -71,6 +72,56 @@ def nonempty_str(v):
 
 def citation_html(text):
     return re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", html.escape(text, quote=False))
+
+
+def validate_hands_on(ho, questions, rep):
+    """The optional hands-on exercise, done in a real tool or on paper outside the page."""
+    flagged = [q.get("id") for q in questions if isinstance(q, dict) and q.get("hands_on")]
+    if ho is None:
+        if flagged:
+            rep.err(f"questions {flagged} are marked hands_on but the Lesson has no hands_on exercise")
+        return
+    if not isinstance(ho, dict):
+        rep.err("practice.json: hands_on must be an object")
+        return
+    for f in ("title", "tool", "goal", "deliverable"):
+        if not nonempty_str(ho.get(f)):
+            rep.err(f"hands_on: '{f}' is missing or empty")
+    level = ho.get("level")
+    if level not in HANDS_ON_LEVELS:
+        rep.err(f"hands_on: level must be one of {list(HANDS_ON_LEVELS)}")
+    minutes = ho.get("minutes")
+    if not isinstance(minutes, int) or isinstance(minutes, bool) or minutes <= 0:
+        rep.err("hands_on: minutes must be a positive integer")
+    elif minutes > 60:
+        rep.warn(f"hands_on: {minutes} minutes is long; split it, or move part of it to the next Lesson")
+    for f in ("setup", "acceptance"):
+        v = ho.get(f, [])
+        if not isinstance(v, list) or not all(nonempty_str(x) for x in v):
+            rep.err(f"hands_on: {f} must be a list of strings")
+    steps = ho.get("steps", [])
+    if not isinstance(steps, list):
+        rep.err("hands_on: steps must be a list")
+        steps = []
+    for i, st in enumerate(steps, 1):
+        if not isinstance(st, dict) or not nonempty_str(st.get("do")):
+            rep.err(f"hands_on step {i}: 'do' is missing or empty")
+            continue
+        if level in ("guided", "scaffolded") and not nonempty_str(st.get("check")):
+            rep.err(f"hands_on step {i}: {level} steps need a 'check' (what the Learner should see when it worked)")
+        for f in ("check", "hint"):
+            if f in st and not nonempty_str(st[f]):
+                rep.err(f"hands_on step {i}: '{f}' is empty")
+    if level == "guided" and len(steps) < 5:
+        rep.warn(f"hands_on: a guided exercise with {len(steps)} step(s) is probably skipping clicks; aim for 5-20")
+    if level == "scaffolded" and not 3 <= len(steps) <= 10:
+        rep.warn(f"hands_on: {len(steps)} scaffolded steps; aim for 3-10")
+    if level == "independent" and len(ho.get("acceptance") or []) < 2:
+        rep.err("hands_on: an independent exercise needs at least 2 acceptance criteria")
+    if level in ("guided", "scaffolded") and not steps:
+        rep.err(f"hands_on: a {level} exercise needs steps")
+    if not flagged:
+        rep.err("hands_on: mark at least one question \"hands_on\": true, answerable only by doing the exercise")
 
 
 def validate(course_dir, lesson_id, data, content, rep):
@@ -177,6 +228,7 @@ def validate(course_dir, lesson_id, data, content, rep):
             full = 0
         if full and q.get("concept") in cids:
             practised[q["concept"]] = practised.get(q["concept"], 0) + 1
+    validate_hands_on(data.get("hands_on"), questions, rep)
     for cid in sorted(core - practised.keys()):
         rep.err(f"core concept '{cid}' has no question: the pass rule needs at least one per core concept")
     for cid in sorted(cids - core - practised.keys()):
@@ -236,7 +288,8 @@ def build(course_dir, lesson_id, data, content):
             for r in data.get("references", [])
         ],
     }
-    practice = {"course": data["course"], "lesson": lesson_id, "questions": data["questions"]}
+    practice = {"course": data["course"], "lesson": lesson_id, "questions": data["questions"],
+                "hands_on": data.get("hands_on")}
     encoded = base64.b64encode(json.dumps(practice, ensure_ascii=False).encode("utf-8")).decode("ascii")
     libs = "\n".join(tag for name in data.get("libraries", []) for tag in LIBRARIES[name])
     lesson_w, review_w = TITLE_WORDS.get(data["language"][:2].lower(), TITLE_WORDS["en"])
@@ -323,6 +376,9 @@ def main():
     summary = (f"{args.lesson_id}: '{data['title']}' · {len(qs)} questions "
                f"({sum(q['type'] == 'mc' for q in qs)} mc, {sum(q['type'] == 'written' for q in qs)} written) · "
                f"{len(data['concepts'])} concepts · {len(data.get('references', []))} references")
+    if data.get("hands_on"):
+        ho = data["hands_on"]
+        summary += f" · hands-on ({ho['level']}, {len(ho.get('steps', []))} steps, ~{ho['minutes']} min)"
     if args.check:
         print(f"CHECK OK: {summary}")
         return 0

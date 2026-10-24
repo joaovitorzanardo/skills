@@ -166,10 +166,19 @@ def main():
             section.append(f"- {q['id']}: " + " ".join(str(a).split()))
     if args.notes.strip():
         section += ["", f"notes: {args.notes.strip()}"]
+    ho = block.get("hands_on")
+    ho_line = None
+    if data.get("hands_on") and isinstance(ho, dict) and isinstance(ho.get("ticked"), list):
+        ho_line = f"hands-on: {len(ho['ticked'])} / {ho.get('of', '?')} ticked (self-reported, not scored)"
+        section.insert(6, ho_line)
     section_text = "\n".join(section) + "\n"
 
     print(f"{lesson} attempt {attempt}: {pct(score)}, {verdict}")
     print(f"missed core concepts: {', '.join(missed) if missed else 'none'}")
+    if ho_line:
+        print(ho_line)
+    elif data.get("hands_on"):
+        print("hands-on: not reported in the block")
     print("by concept:")
     names = {c["id"]: c["name"] for c in data["concepts"]}
     for cid, c in by_concept.items():

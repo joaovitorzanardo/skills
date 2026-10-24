@@ -93,6 +93,30 @@ table{border-collapse:collapse;width:100%;font:400 15px/1.5 var(--ui);margin:24p
 th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
 .katex-display{overflow-x:auto;overflow-y:hidden;padding:4px 0}
 
+/* hands-on */
+#hands-on{margin-top:72px;padding-top:40px;border-top:1px solid var(--line);font:400 16px/1.6 var(--ui)}
+#hands-on .ho-goal{font:400 18px/1.65 var(--read);color:var(--text-soft);margin:0 0 20px}
+.ho-box{margin:0 0 20px;padding:16px 20px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.ho-box>p:first-child{margin:0 0 6px;font:600 12px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.ho-box ul{margin:0;padding-left:20px}
+.ho-box li{margin:4px 0}
+.ho-box.deliver{border-color:var(--accent-2);background:var(--accent-2-bg)}
+#ho-steps{list-style:none;margin:0 0 20px;padding:0;counter-reset:step}
+.ho-step{counter-increment:step;margin:0 0 14px;padding:16px 18px;background:var(--surface);border:1px solid var(--line);border-radius:12px;transition:border-color .15s,background .15s}
+.ho-step.done{border-color:var(--good);background:var(--good-bg)}
+.ho-step label.ho-tick{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
+.ho-step label.ho-tick input{margin-top:5px;accent-color:var(--good);flex:none}
+.ho-step label.ho-tick>div::before{content:counter(step) ". ";font-weight:700;color:var(--muted)}
+.ho-step .ho-do>:first-child{display:inline}
+.ho-check{margin:10px 0 0 26px;padding:8px 12px;border-left:3px solid var(--good);background:var(--surface-2);border-radius:0 8px 8px 0;font-size:15px}
+.ho-check b{color:var(--good)}
+.ho-step details{margin:8px 0 0 26px;font-size:15px}
+.ho-step summary{cursor:pointer;color:var(--accent);font-weight:600}
+#ho-acc label{display:flex;gap:10px;align-items:flex-start;margin:6px 0;cursor:pointer}
+#ho-acc input{margin-top:5px;accent-color:var(--good)}
+#ho-count{font:600 14px var(--ui);color:var(--muted)}
+.q-tag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--accent-2-bg);color:var(--accent-2);letter-spacing:.04em}
+
 /* practice */
 #practice{margin-top:72px;padding-top:40px;border-top:1px solid var(--line)}
 .sec-h{font:700 26px/1.25 var(--ui);margin:0 0 8px}
@@ -174,6 +198,17 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
 <!--__TM_CONTENT__-->
     </article>
 
+    <section id="hands-on" aria-labelledby="ho-h" hidden>
+      <h2 class="sec-h" id="ho-h"></h2>
+      <p class="sec-sub" id="ho-sub"></p>
+      <div class="ho-goal" id="ho-goal"></div>
+      <div class="ho-box" id="ho-setup" hidden><p id="ho-setup-h"></p><ul></ul></div>
+      <ol id="ho-steps"></ol>
+      <div class="ho-box" id="ho-acc" hidden><p id="ho-acc-h"></p></div>
+      <div class="ho-box deliver" id="ho-deliver"><p id="ho-deliver-h"></p><div id="ho-deliver-t"></div></div>
+      <p id="ho-count"></p>
+    </section>
+
     <section id="practice" aria-labelledby="practice-h">
       <h2 class="sec-h" id="practice-h"></h2>
       <p class="sec-sub" id="practice-sub"></p>
@@ -243,6 +278,10 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
           askPh: "Ask anything about the lesson…", askHint: "Select a passage first to ask about it.", askIntro: "Stuck on something? Ask here. Claude has the whole lesson in front of it.",
           sugg: ["Explain the main idea in simpler words", "Give me another worked example", "What's the most common mistake here?"],
           suggSel: "Explain the selected passage", about: "About this passage:",
+          ho: "Hands-on", hoMin: "min hands-on", hoLevel: { guided: "Guided, step by step", scaffolded: "Step goals, with hints", independent: "On your own" },
+          hoSub: "Do this in the real tool, with this page open beside it. Tick each step as you finish it. If you get stuck, ask Claude: tell it which step and what you see.",
+          hoSetup: "Before you start", hoCheck: "You should see:", hoHint: "Hint", hoAcc: "Done when", hoDeliver: "Bring to Claude",
+          hoCount: (a, b) => `${a} / ${b} ticked`, hoQ: "Hands-on",
           errs: { not_granted: "Claude isn't allowed on this page. You can allow it from the artifact's Permissions menu.", rate_limited: "Too many questions at once. Wait a minute and try again.",
                   session_expired: "Sign in to Claude again, then retry.", refused: "Claude couldn't answer that. Try rephrasing the question.", generic: "Something went wrong. Try again." } },
     pt: { toc: "Conteúdo", obj: "Ao final desta lição você será capaz de", min: "min de leitura", qs: "questões",
@@ -258,6 +297,10 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
           askPh: "Pergunte qualquer coisa sobre a lição…", askHint: "Selecione um trecho antes para perguntar sobre ele.", askIntro: "Travou em algo? Pergunte aqui. O Claude tem a lição inteira na frente dele.",
           sugg: ["Explique a ideia principal com palavras mais simples", "Me dê outro exemplo resolvido", "Qual é o erro mais comum aqui?"],
           suggSel: "Explique o trecho selecionado", about: "Sobre este trecho:",
+          ho: "Mão na massa", hoMin: "min de prática", hoLevel: { guided: "Guiado, passo a passo", scaffolded: "Objetivos por etapa, com dicas", independent: "Por conta própria" },
+          hoSub: "Faça na ferramenta de verdade, com esta página aberta ao lado. Marque cada passo ao terminar. Se travar, pergunte ao Claude: diga em qual passo está e o que aparece na tela.",
+          hoSetup: "Antes de começar", hoCheck: "Você deve ver:", hoHint: "Dica", hoAcc: "Pronto quando", hoDeliver: "Leve para o Claude",
+          hoCount: (a, b) => `${a} / ${b} marcados`, hoQ: "Mão na massa",
           errs: { not_granted: "O Claude não está liberado nesta página. Libere pelo menu de Permissões do artifact.", rate_limited: "Muitas perguntas de uma vez. Espere um minuto e tente de novo.",
                   session_expired: "Entre no Claude de novo e tente outra vez.", refused: "O Claude não conseguiu responder. Tente reformular a pergunta.", generic: "Algo deu errado. Tente de novo." } },
   };
@@ -267,7 +310,8 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
   const label = meta.kind === "remedial" ? `${T.remedial} · ${T.lesson} ${meta.number}` : `${T.lesson} ${meta.number}`;
   $("#kicker").textContent = `${meta.topic} · ${label}`;
   $("#title").textContent = meta.title;
-  $("#meta").innerHTML = `<span>~${meta.minutes} ${T.min}</span><span>${P.questions.length} ${T.qs}</span>`;
+  const HO = P.hands_on;
+  $("#meta").innerHTML = `<span>~${meta.minutes} ${T.min}</span>` + (HO ? `<span>~${HO.minutes} ${T.hoMin}</span>` : "") + `<span>${P.questions.length} ${T.qs}</span>`;
   $("#obj-h").textContent = T.obj;
   meta.objectives.forEach((o) => $("#objectives").append(el("li", null, esc(o))));
   $("#practice-h").textContent = T.practice;
@@ -289,7 +333,7 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
   // ---- table of contents + reading progress
   const heads = [...document.querySelectorAll("#content section > h2")];
   heads.forEach((h, i) => { if (!h.id) h.id = `s${i + 1}`; });
-  const tocItems = [...heads.map((h) => [h.id, h.textContent]), ["practice", T.practice], ["references", T.refs]];
+  const tocItems = [...heads.map((h) => [h.id, h.textContent]), ...(HO ? [["hands-on", T.ho]] : []), ["practice", T.practice], ["references", T.refs]];
   tocItems.forEach(([id, text]) => { const a = el("a"); a.href = `#${id}`; a.textContent = text; $("#toc").append(a); });
   const targets = tocItems.map(([id]) => document.getElementById(id));
   const links = [...document.querySelectorAll("#toc a")];
@@ -304,15 +348,52 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
 
   // ---- practice
   const KEY = `teach-me:${P.course}:${P.lesson}`;
-  let state = { answers: {}, submitted: null };
+  let state = { answers: {}, submitted: null, ticks: {} };
   try { state = Object.assign(state, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+
+  // ---- hands-on
+  const hoItems = [];  // [key, checkbox] for every step and acceptance criterion
+  const hoCount = () => { $("#ho-count").textContent = T.hoCount(hoItems.filter(([k]) => state.ticks[k]).length, hoItems.length); };
+  const tick = (key, box) => {
+    const inp = el("input"); inp.type = "checkbox"; inp.checked = !!state.ticks[key];
+    const sync = () => { if (box) box.classList.toggle("done", inp.checked); };
+    inp.addEventListener("change", () => { state.ticks[key] = inp.checked; save(); sync(); hoCount(); });
+    sync(); hoItems.push([key, inp]);
+    return inp;
+  };
+  if (HO) {
+    $("#hands-on").hidden = false;
+    $("#ho-h").textContent = `${T.ho}: ${HO.title}`;
+    $("#ho-sub").innerHTML = `<b>${esc(HO.tool)}</b> · ${esc(T.hoLevel[HO.level])} · ~${HO.minutes} min. ${esc(T.hoSub)}`;
+    $("#ho-goal").innerHTML = HO.goal;
+    if ((HO.setup || []).length) {
+      $("#ho-setup").hidden = false; $("#ho-setup-h").textContent = T.hoSetup;
+      HO.setup.forEach((x) => $("#ho-setup ul").append(el("li", null, x)));
+    }
+    (HO.steps || []).forEach((st, i) => {
+      const li = el("li", "ho-step"); li.id = `ho-s${i + 1}`;
+      const lab = el("label", "ho-tick");
+      lab.append(tick(`s${i + 1}`, li), el("div", "ho-do", st.do));
+      li.append(lab);
+      if (st.check) li.append(el("div", "ho-check", `<b>${esc(T.hoCheck)}</b> ${st.check}`));
+      if (st.hint) { const d = el("details"); d.append(el("summary", null, esc(T.hoHint)), el("div", null, st.hint)); li.append(d); }
+      $("#ho-steps").append(li);
+    });
+    if ((HO.acceptance || []).length) {
+      $("#ho-acc").hidden = false; $("#ho-acc-h").textContent = T.hoAcc;
+      HO.acceptance.forEach((x, i) => { const lab = el("label"); lab.append(tick(`a${i + 1}`), el("span", null, x)); $("#ho-acc").append(lab); });
+    }
+    $("#ho-deliver-h").textContent = T.hoDeliver;
+    $("#ho-deliver-t").innerHTML = HO.deliverable;
+    hoCount();
+  }
 
   const quiz = $("#quiz");
   P.questions.forEach((q, i) => {
     const box = el("div", "q");
     box.id = `q-${q.id}`;
-    box.append(el("p", "q-n", `${T.q} ${i + 1}${q.type === "written" ? " · " + T.written : ""}`));
+    box.append(el("p", "q-n", `${T.q} ${i + 1}${q.type === "written" ? " · " + T.written : ""}${q.hands_on ? `<span class="q-tag">${esc(T.hoQ)}</span>` : ""}`));
     box.append(el("div", "q-p", q.prompt));
     if (q.type === "mc") {
       q.options.forEach((o, j) => {
@@ -344,7 +425,9 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
   const block = () => {
     const answers = {};
     P.questions.forEach((q) => { const a = state.answers[q.id]; answers[q.id] = answered(q) ? (q.type === "mc" ? a : a.trim()) : null; });
-    return "TEACH-ME RESULTS v1\n" + JSON.stringify({ course: P.course, lesson: P.lesson, submitted: state.submitted, answers });
+    const out = { course: P.course, lesson: P.lesson, submitted: state.submitted, answers };
+    if (HO) out.hands_on = { ticked: hoItems.filter(([k]) => state.ticks[k]).map(([k]) => k), of: hoItems.length };
+    return "TEACH-ME RESULTS v1\n" + JSON.stringify(out);
   };
 
   const showResults = () => {
@@ -405,6 +488,7 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
   const plain = (h) => { const d = document.createElement("div"); d.innerHTML = h; return d.textContent; };
   const lessonText = () => {
     const content = $("#content").innerText.replace(/\n{3,}/g, "\n\n").slice(0, 80000);
+    const ho = HO ? `\n\n## Hands-on exercise (${HO.level}, in ${HO.tool})\n${$("#hands-on").innerText.replace(/\n{3,}/g, "\n\n")}\nSteps the Learner has ticked: ${hoItems.filter(([k]) => state.ticks[k]).map(([k]) => k).join(", ") || "none"}` : "";
     const refs = meta.references.map((r) => `- [${r.id}] ${plain(r.citation_html)}${r.url ? " " + r.url : ""}`).join("\n");
     const qs = P.questions.map((q, i) => {
       let s = `Q${i + 1} (${q.type === "mc" ? "multiple choice" : "written"}): ${plain(q.prompt)}`;
@@ -416,7 +500,7 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
       }
       return s;
     }).join("\n\n");
-    return `# ${meta.topic}: ${meta.title}\n\nObjectives:\n${meta.objectives.map((o) => "- " + o).join("\n")}\n\n## Lesson text\n${content}\n\n## Practice (${state.submitted ? "already submitted" : "NOT submitted yet"})\n${qs}\n\n## References\n${refs}`;
+    return `# ${meta.topic}: ${meta.title}\n\nObjectives:\n${meta.objectives.map((o) => "- " + o).join("\n")}\n\n## Lesson text\n${content}${ho}\n\n## Practice (${state.submitted ? "already submitted" : "NOT submitted yet"})\n${qs}\n\n## References\n${refs}`;
   };
   const rules = () => [
     "You are the tutor inside a lesson page the Learner is reading. They ask you questions about the material below.",
@@ -427,6 +511,7 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
       ? "The Practice is submitted: you may explain any question, why their answer was right or wrong, and the correct answer."
       : "The Practice is NOT submitted yet: never reveal, confirm or rule out the answer to a Practice question. Give a hint that points to the part of the lesson that answers it.",
     "When you point to sources, use only the lesson's references. Never invent a citation.",
+    ...(HO ? [`If they're stuck on the hands-on exercise, help them get unstuck in ${HO.tool}: ask which step and what they see, then give the smallest next move. Don't do the exercise for them, and for a guided step don't skip ahead.`] : []),
     "",
     lessonText(),
   ].join("\n");
@@ -520,7 +605,8 @@ textarea{width:100%;min-height:110px;padding:12px;border:1px solid var(--line);b
   input.placeholder = T.askPh;
   const selected = () => {
     const s = getSelection();
-    if (!s || s.isCollapsed || !s.rangeCount || !$("#content").contains(s.getRangeAt(0).commonAncestorContainer)) return "";
+    const inside = (n) => $("#content").contains(n) || $("#hands-on").contains(n);
+    if (!s || s.isCollapsed || !s.rangeCount || !inside(s.getRangeAt(0).commonAncestorContainer)) return "";
     return s.toString().trim().slice(0, 1500);
   };
   // Read the selection on pointerdown: the click that follows can collapse it.
