@@ -29,9 +29,9 @@ Grade against the question's `rubric`: 1, 0.5 or 0.
 
 The script prints the verdict, the overall score, and the core concepts that weren't answered fully correctly at least once. Before you act, look at the pattern. Two wrong answers on the same concept with the same kind of mistake mean a wrong mental model. Scattered single misses usually mean carelessness or a badly worded question. If one of your questions turns out to be ambiguous, say so, and don't count it against the Learner in your next step. Leave the recorded score alone.
 
-**Pass.** Lead with what they got right, specifically. Then cover each wrong answer in a sentence or two, because even a passing attempt deserves to have its mistakes explained. In `SYLLABUS.md`, mark the Lesson `passed: <date>, <score>`, adjust the plan if the results showed something new (e.g. a concept that will need reinforcement), then write the next Lesson.
+**Pass.** Lead with what they got right, specifically. Then cover each wrong answer in a sentence or two, because even a passing attempt deserves to have its mistakes explained. In `SYLLABUS.md`, mark the Lesson `passed: <date>, <score>`, adjust the plan if the results showed something new (e.g. a concept that will need reinforcement), then hand off to a new Session for the next Lesson (SKILL.md, "Handoff").
 
-**Fail, first time on these concepts.** Say plainly which concepts didn't land and what the answers suggest they're thinking. Ask whether they want to talk any of it through right now. If they don't, write `lesson-NN-remedial-1` (see lesson-writing.md, section 5). Note the remedial in the Syllabus under "Changes".
+**Fail, first time on these concepts.** Say plainly which concepts didn't land and what the answers suggest they're thinking. Ask whether they want to talk any of it through right now. If they don't, add `lesson-NN-remedial-1` to the Syllabus under "Changes" and hand off to a new Session to write it (see lesson-writing.md, section 5).
 
 **Fail, second time on the same concepts.** Another Lesson in the same format is unlikely to work. Switch to conversation:
 1. Ask them to explain the concept in their own words, or to talk you through how they answered one of the missed questions.

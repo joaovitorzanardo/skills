@@ -1,6 +1,6 @@
 ---
 name: teach-me
-description: A personal learning accelerator that teaches me one topic until I actually know it. It works out why I want to learn the topic, runs a diagnostic quiz to find what I already know and which fundamentals I'm missing, writes a syllabus, and delivers interactive lessons published as Claude artifacts, with diagrams, simulations, cited sources (textbooks, papers, courses), a practice section, and an Ask Claude panel for questions about the material. When I paste my practice results back, it grades them, moves on or reteaches what didn't stick, and keeps a long-term memory of what I've learned in ~/.study-memory/. Use it whenever I say "teach me X", "I want to learn X", "help me understand X properly", "I need to learn X for my project", "continue my lesson on X", "next lesson", or paste a block starting with "TEACH-ME RESULTS", even if I don't say "lesson". Also use it when I ask what I've studied or how I'm doing on a topic. Don't use it for a quick factual question I want answered in one reply, or to map a whole field (that's area-of-knowledge-expert).
+description: A personal learning accelerator that teaches me one topic until I actually know it. It works out why I want to learn the topic, runs a diagnostic quiz to find what I already know and which fundamentals I'm missing, writes a syllabus, and delivers interactive lessons published as Claude artifacts, with diagrams, simulations, cited sources (textbooks, papers, courses), a practice section, and an Ask Claude panel for questions about the material. When I paste my practice results back, it grades them, moves on or reteaches what didn't stick, and keeps a long-term memory of what I've learned in ~/.study-memory/. Use it whenever I say "teach me X", "I want to learn X", "help me understand X properly", "I need to learn X for my project", "continue my lesson on X", "next lesson", or paste a block starting with "TEACH-ME RESULTS" or "TEACH-ME HANDOFF", even if I don't say "lesson". Also use it when I ask what I've studied or how I'm doing on a topic. Don't use it for a quick factual question I want answered in one reply, or to map a whole field (that's area-of-knowledge-expert).
 ---
 
 # Teach Me
@@ -12,7 +12,7 @@ Goal → Diagnostic → Syllabus → Lesson → Practice → Check ─┬─ pas
                                                           └─ fail → Remedial Lesson (or a talk, then a Lesson)
 ```
 
-The vocabulary is fixed, so use these words consistently with the Learner and in files: **Learner, Profile, Topic, Goal, Session, Course, Diagnostic, Warm-up, Syllabus, Lesson, Remedial Lesson, Practice, Practice Results, Check, Mastery**. Their definitions are in `<skill-dir>/GLOSSARY.md`, which you should read if a term is unclear.
+The vocabulary is fixed, so use these words consistently with the Learner and in files: **Learner, Profile, Topic, Goal, Session, Course, Diagnostic, Warm-up, Syllabus, Lesson, Remedial Lesson, Practice, Practice Results, Check, Handoff, Mastery**. Their definitions are in `<skill-dir>/GLOSSARY.md`, which you should read if a term is unclear.
 
 `<skill-dir>` means this skill's base directory, the absolute path you were given when the skill loaded.
 
@@ -26,6 +26,7 @@ There are two stores, and they stay separate on purpose. Memory stays small and 
   <topic-slug>/
   ├── SYLLABUS.md
   ├── PRACTICE_RESULTS.md        (written only by record_results.py)
+  ├── HANDOFF.md                 (the latest Handoff, overwritten each time)
   ├── lesson-01.html             (published as an Artifact; the Learner opens its link)
   ├── lesson-02-remedial-1.html
   └── src/<lesson-id>/           (your sources for each Lesson)
@@ -45,6 +46,7 @@ Retrieve memory first (memory-retrieval.md, steps 1–6). Then decide which kind
 | What the Learner did | Session |
 |---|---|
 | Pasted a block starting with `TEACH-ME RESULTS` | **Check Session**, Part B |
+| The prompt starts with `TEACH-ME HANDOFF` | **Lesson Session**: see "Handoff", section "Picking up a Handoff" |
 | "Continue", "next lesson", "I finished lesson N", or a known Topic with a Lesson pending | Ask them to paste their results block if a Practice is unchecked (give the Lesson's link from `SYLLABUS.md` if they haven't done it yet), then run **Part B** |
 | A Topic that isn't in memory | **New Topic**, Part A |
 | A known Topic that hasn't been studied for a while, or whose Syllabus is complete | Part A with a **Warm-up** instead of the Diagnostic |
@@ -106,14 +108,46 @@ The script appends the attempt to `PRACTICE_RESULTS.md` and prints the verdict. 
 ### B2. Decide
 
 Read `<skill-dir>/references/check.md` for how to act on the verdict. In short:
-- **Pass:** give brief, specific feedback on what they got right and on any wrong answers, even in a passing attempt. Revise the Syllabus if the results showed something new, then write the next Lesson.
-- **First fail on these concepts:** write a Remedial Lesson that teaches only the missed concepts, from a different angle than the first time.
-- **Second fail on the same concepts:** don't write another Lesson yet. Talk it through in the chat: get them to explain their thinking, find the specific wrong model, and fix it together. Then give a short Practice (a Remedial Lesson with only a recap section and 3–5 questions).
+- **Pass:** give brief, specific feedback on what they got right and on any wrong answers, even in a passing attempt. Revise the Syllabus if the results showed something new. The next Lesson is written in a new Session (see "Handoff").
+- **First fail on these concepts:** the next Lesson is a Remedial Lesson that teaches only the missed concepts, from a different angle than the first time. It's written in a new Session too.
+- **Second fail on the same concepts:** don't write another Lesson yet. Talk it through in the chat: get them to explain their thinking, find the specific wrong model, and fix it together. Then give a short Practice (a Remedial Lesson with only a recap section and 3–5 questions), written in this Session, because the conversation is its material.
 - **Syllabus complete:** congratulate them honestly, sum up what they now know, and suggest where to go next (a related Topic, or a project-shaped exercise).
 
 ### B3. Close the Session
 
-Same as A5.
+If a next Lesson is due (a pass, or a first fail), close with the Handoff. Otherwise (a second fail, whose short Remedial Lesson you just wrote, or a complete Syllabus) close as in A5.
+
+## Handoff: one Lesson per Session
+
+A Session writes at most one Lesson. Writing a Lesson fills the context with research and a large page, so the next one starts in a fresh Session instead of piling onto this one. Memory and `SYLLABUS.md` already hold the state, so the Handoff only has to point at them and carry what the Check noticed.
+
+### Handing off
+
+1. Ask with the question UI: "Ready for <next lesson id, and its title>?" with the options **Yes, open a new session** and **Not now**.
+2. Either way, do the end-of-Session update now (see "End of every Session"), so the new Session retrieves an up-to-date memory.
+3. **Not now:** tell them what comes next (memory is already updated), and tell them that saying "next lesson" in any later Session picks it up.
+4. **Yes:** write `<course-dir>/HANDOFF.md` in this exact shape:
+   ```
+   TEACH-ME HANDOFF v1
+   Use the teach-me skill to write the next Lesson of this Course.
+
+   topic: <topic-slug>
+   course: <absolute course path>
+   next: <lesson id>: <title from SYLLABUS.md>
+   check: <the verdict line from record_results.py>
+   carry over:
+   - <2–5 bullets the next Lesson should account for: misconceptions the answers showed, concepts to reinforce, what they asked or said about pace>
+   ```
+   Keep it under 30 lines. Don't copy in what memory or `SYLLABUS.md` already say.
+5. Run:
+   ```bash
+   python3 <skill-dir>/scripts/launch_session.py <course-dir>
+   ```
+   It opens a new terminal window running `claude` in the Course folder's parent, with `HANDOFF.md` as the first prompt. On exit code 0, tell the Learner the new window is open and they can close this one. On exit code 3, it couldn't open a terminal and printed a command instead. Give them that command to run in a new terminal.
+
+### Picking up a Handoff
+
+When a Session starts with `TEACH-ME HANDOFF`: retrieve memory as usual, read `SYLLABUS.md` and the latest attempt in `PRACTICE_RESULTS.md`, and write the Lesson named in `next:`, taking the `carry over:` bullets into account. Then close as in A5. Don't repeat the Check, which the previous Session already recorded.
 
 ## Writing a Lesson
 

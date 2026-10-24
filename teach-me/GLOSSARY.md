@@ -23,7 +23,7 @@ _Avoid_: Motivation, reason
 ## Teaching loop
 
 **Session**:
-One invocation of the skill, or one pasted block of Practice Results. The first Session for a Topic covers the Goal, the Diagnostic and Lesson 1, and each later one starts with a Check.
+One invocation of the skill, or one pasted block of Practice Results. A Session writes at most one Lesson. The first Session for a Topic covers the Goal, the Diagnostic and Lesson 1. A later one starts from a Handoff and writes the next Lesson, or starts with a Check and ends with a Handoff.
 _Avoid_: Study session, run
 
 **Course**:
@@ -61,6 +61,10 @@ _Avoid_: Test results
 **Check**:
 Judging the Practice Results to decide whether the Learner passed the Lesson or needs a Remedial Lesson. A Lesson passes at ≥ 80% correct with every core concept answered correctly at least once.
 _Avoid_: Evaluation, grading
+
+**Handoff**:
+The short note a Session writes after a Check when another Lesson is due. A new Session starts from it and writes that Lesson, so a single Session's context never has to hold more than one Lesson.
+_Avoid_: Continuation, resume prompt
 
 **Mastery**:
 A 1–5 rating of how well the Learner knows a Topic, based on Practice Results, not on how much was covered.
