@@ -1,6 +1,6 @@
 # Writing a Lesson
 
-Contents: 1. What a good Lesson does · 2. Visuals and interactive widgets · 3. Sources and citations · 4. Practice · 5. Remedial Lessons · 6. File formats (content.html, practice.json) · 7. Syllabus
+Contents: 1. What a good Lesson does · 2. Visuals and interactive widgets · 3. Sources and citations · 4. Practice · 5. Hands-on · 6. Remedial Lessons · 7. File formats (content.html, practice.json) · 8. Syllabus
 
 ## 1. What a good Lesson does
 
@@ -66,7 +66,36 @@ The Practice is how both of you find out whether the Lesson worked, so design it
 - **Written questions need a `model_answer` and a `rubric`.** The rubric says what earns 1 point, 0.5 and 0, so your later grading is consistent and fair.
 - **Interactive tasks:** a question can refer to a widget in the Lesson ("Using the simulator above, what happens when…") as long as the answer is a choice or a short text.
 
-## 5. Remedial Lessons
+## 5. Hands-on
+
+Questions show that the Learner understood. A hands-on exercise shows that they can *do* it: in the real tool, on a real problem, outside the page. Whenever the Topic has something to do (a design tool, code, a circuit on a breadboard, a calculation on paper, a lab measurement), every Lesson gets one, in the `hands_on` block of `practice.json`. Skip it only when there's genuinely nothing to do beyond the questions (a history Topic, say) and write the reason in the Syllabus. "The Learner might not have the tool" isn't a reason: the Diagnostic asks what they have, and the first hands-on can be installing it.
+
+A hands-on is never a paragraph of suggestions ("try drawing a schematic in KiCad"). It's a concrete task with a finished state you could check.
+
+### Pick the level from evidence
+
+How much you guide depends on how well they know *the tool and the task*, not on how bright they are. Read it from the Diagnostic, earlier hands-on ticks, and the hands-on questions in `PRACTICE_RESULTS.md`:
+
+| `level` | When | What you write |
+|---|---|---|
+| `guided` | First time with the tool, or the task is new | 5–20 steps. Each `do` names the exact menu, button, shortcut or command and the values to type. Each `check` says what they should see when it worked ("the ERC window lists one error: …"). A `hint` for the step where people usually get stuck. Nothing left to guess. |
+| `scaffolded` | They've done a guided one and the tool basics are familiar | 3–10 steps that state the goal of each step ("place and wire the three parts") without the click-path. `check` for each, `hint` that points to the right menu or idea. |
+| `independent` | They did the previous level without trouble | A goal and at least 2 `acceptance` criteria ("ERC passes with zero errors", "every trace ≥ 0.25 mm"). Steps are optional milestones. |
+
+Move up one level after a hands-on that went well (most steps ticked and its questions right), and stay or step back after one that didn't. Within a Topic, the hands-on of each Lesson should build on the last when that's possible: for a project Goal, they're building the actual project, one Lesson at a time (Lesson 2's schematic becomes Lesson 3's board layout).
+
+### Writing the steps
+
+- **Research the tool as it is now.** Menus and shortcuts change between versions. Check the current official docs during this Session, put the version in `tool` ("KiCad 9.0"), and cite the docs in the Lesson. If the OS matters, write for the Learner's (it's in the Syllabus header) and note the other one where it differs.
+- **One action per guided step,** with its `check`. A `check` is what lets a novice notice a wrong turn at step 3 instead of at step 12.
+- **Name the trap where it happens.** If a step commonly fails (a library not loaded, a wrong unit), put the fix in that step's `hint`.
+- **Make it produce something** they keep: a file, a measurement, a working program. Say where to save it in `deliverable` (inside the Course folder, e.g. `<course>/hands-on/`), and what to bring to the Check: a file path you can open and read (code, a `.kicad_sch`, a spreadsheet), a screenshot, or a number they measured.
+- **Fit the time:** 15–45 minutes in `minutes`. Bigger tasks get split across Lessons.
+- **Tie it to the Practice.** Mark 1–3 questions `"hands_on": true`, answerable only by having done it: "what error did the ERC report at step 6?", "which resistor value did you pick, and why?". These count toward the pass rule like any other question. The ticks don't: they're self-reported, and only tell you how far they got.
+
+The Ask Claude panel sees the hands-on and which steps are ticked, so it can help with "I'm on step 4 and the search finds nothing" without doing the work for them.
+
+## 6. Remedial Lessons
 
 A Remedial Lesson (`lesson-NN-remedial-K`) teaches only the concepts the Check found missing. Repeating the same explanation louder rarely works, so change the approach:
 
@@ -75,8 +104,9 @@ A Remedial Lesson (`lesson-NN-remedial-K`) teaches only the concepts the Check f
 - **Make it shorter** than a full Lesson: 8–15 minutes.
 - **Write new Practice questions** that use the same concept ids but are new questions. Repeated questions test memory of the answer, not understanding.
 - After a talk-it-through in the chat (second failure), the Remedial Lesson can be just a short recap section plus 3–5 questions.
+- If the hands-on is what failed (steps unfinished, hands-on questions wrong), repeat it one level more guided, not the reading.
 
-## 6. File formats
+## 7. File formats
 
 ### `src/<lesson-id>/content.html`
 
@@ -132,8 +162,27 @@ This is an HTML fragment (no `<html>`, `<head>` or `<body>`). The template suppl
     {"id": "q6", "concept": "series-parallel", "type": "written",
      "prompt": "Explain why adding a second resistor in parallel lowers the total resistance.",
      "model_answer": "Each branch gives current another path, so for the same voltage the total current rises, which means a lower equivalent resistance.",
-     "rubric": "1: mentions extra path and more total current for the same voltage. 0.5: right conclusion, vague reason. 0: says resistance adds up or no reason."}
+     "rubric": "1: mentions extra path and more total current for the same voltage. 0.5: right conclusion, vague reason. 0: says resistance adds up or no reason."},
+    {"id": "q7", "concept": "ohms-law", "type": "mc", "hands_on": true,
+     "prompt": "In the hands-on, what current did your multimeter read through the LED?",
+     "options": ["About 2 mA", "About 14 mA", "About 140 mA"], "answer": 1,
+     "explanation": "(9 − 2) V / 470 Ω ≈ 15 mA; meter and part tolerances put it near 14 mA. 140 mA means a resistor ten times too small: check the colour bands."}
   ],
+  "hands_on": {
+    "title": "Light an LED on a breadboard",
+    "tool": "Breadboard, 9 V battery, multimeter",
+    "level": "guided",
+    "minutes": 25,
+    "goal": "An LED lit through a resistor you sized, and the current measured.",
+    "setup": ["A 9 V battery with a clip, a red LED, a 470 Ω resistor (yellow-violet-brown), a multimeter"],
+    "steps": [
+      {"do": "Push the resistor into row 10 and row 15 of the breadboard.", "check": "Each leg sits in a different numbered row."},
+      {"do": "Put the LED's long leg (anode) in row 15 and its short leg in row 20.", "check": "The resistor and the LED share row 15.",
+       "hint": "If you're unsure which leg is which, the flat edge on the LED's rim is the cathode (short leg)."}
+    ],
+    "acceptance": [],
+    "deliverable": "The current you measured, and a photo of the board if anything looked wrong."
+  },
   "references": [
     {"id": "hayt2012", "citation": "HAYT, W. H.; KEMMERLY, J. E.; DURBIN, S. M. **Engineering circuit analysis**. 8. ed. New York: McGraw-Hill, 2012.", "url": "https://..."}
   ]
@@ -146,8 +195,9 @@ Field rules (the build script enforces them):
 - Question `id`s are `q1`, `q2`, … in order. `answer` is the 0-based index of the correct option.
 - `prompt`, `options` and `explanation` may contain inline HTML (`<code>`, `\( math \)`). The Learner's answers are always shown as plain text.
 - `citation` uses `**bold**` for the part ABNT makes bold. `url` is optional but strongly preferred.
+- `hands_on` is optional (section 5 says when to include it). It needs `title`, `tool`, `level` (`guided`, `scaffolded` or `independent`), `minutes`, `goal` and `deliverable`. `steps` is a list of `{"do", "check", "hint"}`, with `check` required for guided and scaffolded steps. `setup` and `acceptance` are lists of strings, and an independent exercise needs at least 2 `acceptance` criteria. All of these text fields may contain inline HTML. With a `hands_on`, at least one question must carry `"hands_on": true`.
 
-## 7. Syllabus
+## 8. Syllabus
 
 `SYLLABUS.md` at the root of the Course. Update the status column after every Check, put each Lesson's Artifact link in its row when you publish it (Remedial Lessons get their own row), and log every change of plan under "Changes".
 
@@ -157,6 +207,7 @@ Field rules (the build script enforces them):
 goal: build a small LED driver board for my bike
 language: pt-BR
 started: 2026-10-23
+tools: KiCad 9.0 on Windows 11; breadboard kit and multimeter
 
 ## Starting point
 
@@ -166,11 +217,11 @@ started: 2026-10-23
 
 ## Lessons
 
-| # | Lesson | Concepts | Status | Link |
-|---|---|---|---|---|
-| 01 | Circuits before boards | ohms-law, series-parallel, units | passed: 2026-10-24, 90% | https://claude.ai/… |
-| 02 | Reading a schematic | schematic-symbols, nets | current | https://claude.ai/… |
-| 03 | Components and datasheets | … | planned | |
+| # | Lesson | Concepts | Hands-on | Status | Link |
+|---|---|---|---|---|---|
+| 01 | Circuits before boards | ohms-law, series-parallel, units | guided: LED on a breadboard | passed: 2026-10-24, 90% | https://claude.ai/… |
+| 02 | Reading a schematic | schematic-symbols, nets | guided: draw the driver in KiCad | current | https://claude.ai/… |
+| 03 | Components and datasheets | … | scaffolded: pick footprints | planned | |
 
 ## Optional, later
 

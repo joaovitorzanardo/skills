@@ -25,6 +25,13 @@ Grade against the question's `rubric`: 1, 0.5 or 0.
 - A blank answer gets 0. Mention it kindly, because skipping usually means "I don't know", which is itself useful information.
 - Put what you noticed in `--notes`, one short clause per question. Notes go into `PRACTICE_RESULTS.md` and are what a later Remedial Lesson builds on.
 
+## Hands-on
+
+If the Lesson had a hands-on, the script prints how many steps they ticked. Ticks are self-reported and never scored; the hands-on questions are what count.
+- Ask for the `deliverable` if they didn't paste it: open the file at the path they give (most design files and all code are text you can read) or look at the screenshot. Say specifically what's right and what you'd fix, in a few lines.
+- Few steps ticked: ask where they got stuck before reading anything into the score. A tool problem (install, version, menu not where the Lesson said) is your fix, not their failure. Note it in the Handoff so the next Lesson avoids it.
+- Use what you see to pick the next hands-on's `level` (lesson-writing.md, section 5), and write it in the Syllabus row.
+
 ## Acting on the verdict
 
 The script prints the verdict, the overall score, and the core concepts that weren't answered fully correctly at least once. Before you act, look at the pattern. Two wrong answers on the same concept with the same kind of mistake mean a wrong mental model. Scattered single misses usually mean carelessness or a badly worded question. If one of your questions turns out to be ambiguous, say so, and don't count it against the Learner in your next step. Leave the recorded score alone.

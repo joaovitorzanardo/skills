@@ -54,6 +54,10 @@ _Avoid_: Review lesson, retry
 The exercise at the end of a Lesson. It can be multiple choice, written answers or an interactive task.
 _Avoid_: Test, quiz, exam
 
+**Hands-on**:
+The practical exercise in a Lesson, done in the real tool or on a real problem outside the page. It's guided step by step, scaffolded, or left to the Learner, depending on how well they know the tool. It ends with something they made, which they bring to the Check.
+_Avoid_: Lab, project, homework
+
 **Practice Results**:
 The Learner's recorded answers and score for a Lesson's Practice.
 _Avoid_: Test results

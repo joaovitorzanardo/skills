@@ -12,7 +12,7 @@ Goal → Diagnostic → Syllabus → Lesson → Practice → Check ─┬─ pas
                                                           └─ fail → Remedial Lesson (or a talk, then a Lesson)
 ```
 
-The vocabulary is fixed, so use these words consistently with the Learner and in files: **Learner, Profile, Topic, Goal, Session, Course, Diagnostic, Warm-up, Syllabus, Lesson, Remedial Lesson, Practice, Practice Results, Check, Handoff, Mastery**. Their definitions are in `<skill-dir>/GLOSSARY.md`, which you should read if a term is unclear.
+The vocabulary is fixed, so use these words consistently with the Learner and in files: **Learner, Profile, Topic, Goal, Session, Course, Diagnostic, Warm-up, Syllabus, Lesson, Remedial Lesson, Practice, Hands-on, Practice Results, Check, Handoff, Mastery**. Their definitions are in `<skill-dir>/GLOSSARY.md`, which you should read if a term is unclear.
 
 `<skill-dir>` means this skill's base directory, the absolute path you were given when the skill loaded.
 
@@ -68,7 +68,7 @@ Read `<skill-dir>/references/diagnostic.md` and follow it. In short:
 - Probe the prerequisites first, then familiarity with the Topic itself, and adapt as answers come in.
 - For a known Topic, run a 3–5 question Warm-up on what the topic file says they know, instead of the full Diagnostic.
 
-Finish with a short, honest summary for the Learner. Say what they're solid on, what's shaky, and what's missing.
+Finish with a short, honest summary for the Learner. Say what they're solid on, what's shaky, and what's missing. If the Topic has hands-on work, also ask which tools they have, on which OS, and whether they've used them (diagnostic.md, section 4).
 
 ### A3. Syllabus
 
@@ -76,6 +76,7 @@ Write `SYLLABUS.md` using the format in `<skill-dir>/references/lesson-writing.m
 - Missing prerequisites come first, as their own Lessons or as a review section at the start of Lesson 1, depending on how much is missing.
 - For a project Goal, include what the project needs and list the rest of the Topic under "Optional, later".
 - For a curiosity, review or exam Goal, follow the Topic's natural textbook order.
+- Plan a Hands-on for each Lesson, at a level that rises as they get comfortable with the tool. For a project Goal, the Hands-on exercises build the project itself, piece by piece.
 
 Show the Learner the plan in a few lines. It's a living document: you revise it after every Check.
 
@@ -155,7 +156,8 @@ Read `<skill-dir>/references/lesson-writing.md` before writing any Lesson. It co
 
 1. **Research first.** Use web search to find and check the sources you'll cite: textbooks, seminal papers and university courses for established subjects; recent posts, docs and talks for fast-moving ones. Cite only what you actually found during this Session, never a reference from memory. An invented citation destroys the Learner's trust in everything else.
 2. **Write `src/<lesson-id>/content.html`.** This is the Lesson body as an HTML fragment, with inline SVG diagrams, interactive widgets and ABNT in-text citations linking to `#ref-<id>`. Write it in the Learner's language: the one they write to you in, unless the Profile says otherwise.
-3. **Write `src/<lesson-id>/practice.json`.** This holds the metadata, concepts, Practice questions with answers and explanations, and the references.
+3. **Write `src/<lesson-id>/practice.json`.** This holds the metadata, concepts, Practice questions with answers and explanations, the references, and the **Hands-on**.
+   Whenever the Topic has something to do (a tool, code, a circuit, a calculation on paper), the Lesson gets a Hands-on: a concrete task in the real tool that ends in something the Learner made. It's never a paragraph of suggestions. Its level comes from evidence. A Learner new to the tool gets `guided`: every click and value spelled out, with a "you should see" check after each step. As they show they can manage, they move to `scaffolded` (the goal of each step, plus hints) and then `independent` (a goal and acceptance criteria). Mark 1–3 Practice questions `"hands_on": true`, answerable only by having done it. lesson-writing.md, section 5, has the details.
 4. **Build it:**
    ```bash
    python3 <skill-dir>/scripts/build_lesson.py <course-dir> <lesson-id>

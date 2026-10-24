@@ -49,6 +49,8 @@ Give a short message in the Learner's language with three groups:
 
 Then add one or two of the most interesting misconceptions you spotted, explained kindly. Record the same three groups in `SYLLABUS.md` under "Starting point".
 
+If the Topic has hands-on work (lesson-writing.md, section 5), ask one more question before you write the Syllabus: which tools they have or can install, their OS, and whether they've used the tool before. Record it in the Syllabus `tools:` line. "Never opened it" means the first hands-on is `guided`.
+
 ## Warm-up (a known Topic)
 
 A Warm-up replaces the Diagnostic when the topic file already says what the Learner knows. It checks retention, not prerequisites.
