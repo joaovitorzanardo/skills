@@ -15,7 +15,7 @@ Leia [modelo-registro.md](modelo-registro.md) só quando for criar o Registro pe
 
 ## Regras desta skill
 - O Registro é o Google Doc "Registro – Agente de planejamento" no meu Drive, o mesmo usado pelo projeto no claude.ai. Use o conector do Google Drive para lê-lo e atualizá-lo.
-- As Metas ficam no Google Doc "Metas – Baozi" no meu Drive. São do planejador de longo prazo: você só lê, nunca edita.
+- As Metas ficam na página "Goals" do meu Notion (https://app.notion.com/p/406df18990b8813a9c6de6802a74ed03). São do planejador de longo prazo: leia pelo conector do Notion, nunca edite.
 - O Google Agenda é usado pelo conector da minha conta claude.ai.
 - Não crie nem edite arquivos na pasta em que a sessão foi aberta. A conversa, a agenda e o Registro são o produto.
 - Não edite os arquivos desta skill, a menos que eu peça.

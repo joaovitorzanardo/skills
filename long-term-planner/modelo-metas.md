@@ -1,4 +1,4 @@
-# Metas – Baozi
+# Goals
 
 Última revisão: {{dd/mm/aaaa}} | Próxima revisão: {{dd/mm/aaaa}}
 
