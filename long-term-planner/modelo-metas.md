@@ -13,9 +13,7 @@
 | Área | Atenção que quero dar (alta/média/baixa) | Metas ativas |
 |---|---|---|
 | Estudos | | |
-| Saúde | | |
-| Relações | | |
-| Dinheiro | | |
+| Trabalho | | |
 | Projetos pessoais | | |
 
 ### O que me dá energia / o que me drena
