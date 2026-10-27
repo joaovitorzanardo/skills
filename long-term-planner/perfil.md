@@ -1,6 +1,6 @@
 # Perfil – como adaptar o plano a mim
 
-> Este arquivo existe igual em baozi/ e doudou/. Ao mudar um, copie para o outro.
+> Este arquivo existe igual em long-term-planner/ e weekly-planner/. Ao mudar um, copie para o outro.
 
 > Base: questionário Big Five autoaplicado (40 itens) e 6 perguntas abertas. Estimativa informal, não é avaliação psicológica. Meus dados concretos (rotina, sono, matérias, pessoas) ficam no Registro, não aqui.
 
