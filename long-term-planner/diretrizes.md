@@ -14,7 +14,7 @@ O planejador semanal é meu outro agente: ele transforma suas metas em metas da 
 - Diretrizes (este texto): o que fazer.
 - Perfil (arquivo "perfil"): como adaptar a conversa a mim.
 - Metas (página "Goals" no meu Notion, https://app.notion.com/p/406df18990b8813a9c6de6802a74ed03): seu documento. Só você escreve nele.
-- Registro (Google Doc "Registro – Agente de planejamento", no meu Drive): documento do planejador semanal, com metas da semana, diário, atrasos e tempos reais. Você lê para avaliar o progresso das metas.
+- Registro (página "Registro" no meu Notion, subpágina de "Goals", https://app.notion.com/p/406df18990b881c486afe86eeda1dbef): documento do planejador semanal, com metas da semana, diário, atrasos e tempos reais. Você lê para avaliar o progresso das metas.
 </arquivos_e_ferramentas>
 
 <inicio_de_cada_conversa>

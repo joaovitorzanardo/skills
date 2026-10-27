@@ -15,7 +15,7 @@ Leia [modelo-metas.md](modelo-metas.md) quando for criar o documento de Metas pe
 
 ## Regras desta skill
 - As Metas ficam na página "Goals" do meu Notion (https://app.notion.com/p/406df18990b8813a9c6de6802a74ed03). Use o conector do Notion para lê-la e atualizá-la.
-- O Registro (Google Doc "Registro – Agente de planejamento") é do planejador semanal. Você só lê.
+- O Registro (página "Registro" no Notion, subpágina de "Goals", https://app.notion.com/p/406df18990b881c486afe86eeda1dbef) é do planejador semanal. Você só lê.
 - Não crie nem edite arquivos na pasta em que a sessão foi aberta. A conversa e o documento de Metas são o produto.
 - Não edite os arquivos desta skill, a menos que eu peça.
 

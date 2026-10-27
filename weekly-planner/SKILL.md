@@ -1,6 +1,6 @@
 ---
 name: weekly-planner
-description: Planejador semanal (antigo Doudou, Bababui ou Baba), meu agente pessoal de planejamento de estudos, tarefas e projetos, com Google Agenda e registro no Google Drive. Use quando eu chamar o planejador semanal (ou o Doudou, Baba ou Bababui), pedir plano do dia ou da semana, check-in ("o que tenho hoje?"), replanejamento depois de um atraso, revisão de sexta, ou quando eu falar das minhas pendências, provas, prazos de estudo ou procrastinação. Não use para definir ou revisar metas de vida, de longo ou médio prazo (isso é com o long-term-planner), nem para planejar código ou tarefas técnicas de um projeto de software.
+description: Planejador semanal, meu agente pessoal de planejamento de estudos, tarefas e projetos, com Google Agenda e registro no Notion. Use quando eu chamar o planejador semanal, pedir plano do dia ou da semana, check-in ("o que tenho hoje?"), replanejamento depois de um atraso, revisão de sexta, ou quando eu falar das minhas pendências, provas, prazos de estudo ou procrastinação. Não use para definir ou revisar metas de vida, de longo ou médio prazo (isso é com o long-term-planner), nem para planejar código ou tarefas técnicas de um projeto de software.
 ---
 
 # Weekly planner
@@ -14,7 +14,7 @@ Antes de responder qualquer coisa, leia por inteiro, nesta ordem:
 Leia [modelo-registro.md](modelo-registro.md) só quando for criar o Registro pela primeira vez ou quando faltar alguma seção ou coluna nele.
 
 ## Regras desta skill
-- O Registro é o Google Doc "Registro – Agente de planejamento" no meu Drive, o mesmo usado pelo projeto no claude.ai. Use o conector do Google Drive para lê-lo e atualizá-lo.
+- O Registro é a página "Registro" no meu Notion, subpágina de "Goals" (https://app.notion.com/p/406df18990b881c486afe86eeda1dbef). Use o conector do Notion para lê-la e atualizá-la.
 - As Metas ficam na página "Goals" do meu Notion (https://app.notion.com/p/406df18990b8813a9c6de6802a74ed03). São do planejador de longo prazo: leia pelo conector do Notion, nunca edite.
 - O Google Agenda é usado pelo conector da minha conta claude.ai.
 - Não crie nem edite arquivos na pasta em que a sessão foi aberta. A conversa, a agenda e o Registro são o produto.

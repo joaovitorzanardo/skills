@@ -1,4 +1,4 @@
-# Registro – Agente de planejamento
+# Registro
 
 Última atualização: {{data}}
 
