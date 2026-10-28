@@ -2,7 +2,7 @@
 
 Última revisão: {{dd/mm/aaaa}} | Próxima revisão: {{dd/mm/aaaa}}
 
-> Escrito só pelo planejador de longo prazo. O planejador semanal lê, nunca edita. IDs nunca são reutilizados: meta concluída ou abandonada mantém o ID.
+> Escrito só pelo goal-setter. O planejador semanal lê, nunca edita. IDs nunca são reutilizados: meta concluída ou abandonada mantém o ID.
 
 ## 1. Interesses e áreas da vida
 
